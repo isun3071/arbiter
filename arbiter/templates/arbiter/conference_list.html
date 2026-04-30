@@ -1,0 +1,58 @@
+{# Author: Ian Sun | isun@bu.edu                                              #}
+{# Description: Browses all conferences in the Arbiter catalog. Each card    #}
+{# shows the conference's name, date range, location, description preview,   #}
+{# and session count. For signed-in users a "Registered" chip is rendered     #}
+{# on rows where the user has an Attendee for that conference.                #}
+
+{% extends 'arbiter/base.html' %}
+
+{% block title %}Conferences &middot; Arbiter{% endblock %}
+
+{% block content %}
+<section class="list-page">
+    <header class="page-header">
+        <p class="eyebrow">Catalog</p>
+        <h1>Conferences</h1>
+        <p class="lede">
+            Pick one to browse the agenda or check your registration.
+        </p>
+    </header>
+
+    <ul class="conference-list stack">
+        {% for conference in conferences %}
+            <li class="conference-card">
+                <div class="conference-meta">
+                    <h2 class="conference-name">
+                        <a href="{% url 'arbiter:conference_detail' conference.pk %}">
+                            {{ conference.name }}
+                        </a>
+                    </h2>
+                    <p class="conference-when">
+                        {{ conference.start_date|date:"M j" }}&ndash;{{ conference.end_date|date:"M j, Y" }}
+                        &middot; {{ conference.location }}
+                    </p>
+                    {% if conference.description %}
+                        <p class="conference-blurb">{{ conference.description|truncatewords:30 }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="conference-aside">
+                    <p class="conf-count">
+                        {{ conference.session_count }} session{{ conference.session_count|pluralize }}
+                    </p>
+                    {% if conference.pk in user_attendee_conference_ids %}
+                        <span class="chip chip-filled">Registered</span>
+                    {% endif %}
+                    <a class="button-link" href="{% url 'arbiter:conference_detail' conference.pk %}">
+                        Open
+                    </a>
+                </div>
+            </li>
+        {% empty %}
+            <li class="empty-state">
+                <p class="lede">No conferences in the catalog yet.</p>
+            </li>
+        {% endfor %}
+    </ul>
+</section>
+{% endblock %}

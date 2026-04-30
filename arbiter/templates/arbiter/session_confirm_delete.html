@@ -1,0 +1,43 @@
+{# Author: Ian Sun | isun@bu.edu                                              #}
+{# Description: Staff-only confirm-and-delete page for a Session. Surfaces #}
+{# the cascade implication (every AttendanceLog referencing this session  #}
+{# will also be deleted) so the staff user knows the blast radius before  #}
+{# pressing the destructive button.                                        #}
+
+{% extends 'arbiter/base.html' %}
+
+{% block title %}Delete session &middot; Arbiter{% endblock %}
+
+{% block content %}
+<section class="form-page">
+    <p class="eyebrow">Staff &middot; sessions</p>
+    <h1>Delete this session?</h1>
+
+    <p class="lede">
+        You are about to remove <strong>{{ object.title }}</strong> from
+        {{ object.conference.name }}. This cannot be undone. Any
+        AttendanceLog rows referencing this session will also be deleted
+        via cascade.
+    </p>
+
+    <article class="log-summary">
+        <span class="session-pill">{{ object.topic_area }}</span>
+        <h2 class="log-title">{{ object.title }}</h2>
+        <p class="log-when">
+            {{ object.time_slot|date:"D, M j, g:i A" }}
+        </p>
+        {% if object.speaker %}
+            <p class="log-notes">{{ object.speaker }}</p>
+        {% endif %}
+        {% if object.description %}
+            <p class="log-notes">{{ object.description|truncatewords:40 }}</p>
+        {% endif %}
+    </article>
+
+    <form method="post" action="" class="cta-row">
+        {% csrf_token %}
+        <button type="submit" class="button-primary button-danger">Yes, delete</button>
+        <a class="button-link" href="{% url 'arbiter:session_list' %}">Keep it</a>
+    </form>
+</section>
+{% endblock %}

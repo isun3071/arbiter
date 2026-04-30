@@ -1,0 +1,41 @@
+{# Author: Ian Sun | isun@bu.edu                                              #}
+{# Description: Confirm-and-delete page for an AttendanceLog. Surfaces the    #}
+{# session and notes preview so the user can verify they are about to remove  #}
+{# the right row before pressing the destructive button.                      #}
+
+{% extends 'arbiter/base.html' %}
+
+{% block title %}Delete log &middot; Arbiter{% endblock %}
+
+{% block content %}
+<section class="form-page">
+    <p class="eyebrow">My attendance</p>
+    <h1>Delete this log?</h1>
+
+    <p class="lede">
+        You are about to remove your log of <strong>{{ object.session.title }}</strong>.
+        This cannot be undone.
+    </p>
+
+    <article class="log-summary">
+        <p class="conf-tag">{{ object.session.conference.name }}</p>
+        <p class="log-when">{{ object.session.time_slot|date:"D, M j, g:i A" }}</p>
+        <div class="log-status">
+            {% if object.planned %}<span class="chip">Planned</span>{% endif %}
+            {% if object.attended %}<span class="chip chip-filled">Attended</span>{% endif %}
+            {% if object.tension_notes or object.contradiction_flagged %}
+                <span class="chip chip-tension">Tension</span>
+            {% endif %}
+        </div>
+        {% if object.notes %}
+            <p class="log-notes">{{ object.notes|truncatewords:40 }}</p>
+        {% endif %}
+    </article>
+
+    <form method="post" action="" class="cta-row">
+        {% csrf_token %}
+        <button type="submit" class="button-primary button-danger">Yes, delete</button>
+        <a class="button-link" href="{% url 'arbiter:attendance_list' %}">Keep it</a>
+    </form>
+</section>
+{% endblock %}

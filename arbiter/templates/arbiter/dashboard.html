@@ -1,0 +1,207 @@
+{# Author: Ian Sun | isun@bu.edu                                              #}
+{# Description: Authenticated user's dashboard. Single anchor surface that  #}
+{# pulls together the board_question (rendered in a pull-quote treatment),  #}
+{# latest synthesis if one exists, non_session_time_budget if set, recent  #}
+{# AttendanceLogs and VendorVisits side by side, and a "what's next" CTA   #}
+{# row pointing into the three primary workflows. Replaces the home page   #}
+{# for authenticated users — anonymous visitors land on home.html instead.  #}
+
+{% extends 'arbiter/base.html' %}
+
+{% block title %}Dashboard &middot; Arbiter{% endblock %}
+
+{% block content %}
+<section class="dashboard">
+    <header class="dashboard-header">
+        <p class="eyebrow">Your dashboard</p>
+        <h1>Welcome, {{ user.first_name|default:user.username }}</h1>
+        <p class="lede">
+            Registered for {{ attendee.conference.name }}.
+        </p>
+    </header>
+
+    <blockquote class="board-question-quote">
+        <p class="board-question-label">Your board asked</p>
+        <p class="board-question-text">{{ attendee.board_question }}</p>
+    </blockquote>
+
+    <section class="dashboard-actions">
+        <a class="action-card" href="{% url 'arbiter:attendance_create' %}">
+            <span class="action-label">Log a session</span>
+            <span class="action-help">Capture what you heard.</span>
+        </a>
+        <a class="action-card" href="{% url 'arbiter:vendor_create' %}">
+            <span class="action-label">Log a vendor</span>
+            <span class="action-help">Note a booth conversation.</span>
+        </a>
+        {# AI synthesis triggers are POST-only (not idempotent — each #}
+        {# click writes a new Synthesis row) so the action is rendered #}
+        {# as a form-styled button rather than a link. The three forms #}
+        {# below give Catherine a phase-appropriate CTA depending on #}
+        {# how far along she is. #}
+        <form method="post"
+              action="{% url 'arbiter:ai_final_board_rec' %}"
+              class="action-card-form">
+            {% csrf_token %}
+            <button type="submit"
+                    class="action-card action-card-primary action-card-button">
+                <span class="action-label">Get my board recommendation</span>
+                <span class="action-help">Synthesize everything so far.</span>
+            </button>
+        </form>
+    </section>
+
+    <section class="dashboard-actions dashboard-actions-secondary">
+        <form method="post"
+              action="{% url 'arbiter:ai_session_plan' %}"
+              class="action-card-form">
+            {% csrf_token %}
+            <button type="submit" class="action-card action-card-button action-card-quiet">
+                <span class="action-label">Plan my sessions (before)</span>
+                <span class="action-help">Recommend sessions for the board question.</span>
+            </button>
+        </form>
+        <form method="post"
+              action="{% url 'arbiter:ai_dynamic_replan' %}"
+              class="action-card-form">
+            {% csrf_token %}
+            <button type="submit" class="action-card action-card-button action-card-quiet">
+                <span class="action-label">Replan + preliminary rec (during)</span>
+                <span class="action-help">Mid-conference adjustment.</span>
+            </button>
+        </form>
+    </section>
+
+    {# Surface any messages.error from the AI views (rate limits, API #}
+    {# down, parse failures) so the user sees why their click didn't #}
+    {# produce a synthesis. #}
+    {% if messages %}
+        {% for message in messages %}
+            <p class="form-error" role="alert">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
+    {% if latest_synthesis %}
+        <section class="dashboard-synthesis">
+            <div class="dashboard-recent-head">
+                <p class="dashboard-section-label">Latest recommendation</p>
+                <a class="button-link" href="{% url 'arbiter:synthesis_list' %}">View history</a>
+            </div>
+            <a class="synthesis-preview"
+               href="{% url 'arbiter:synthesis_detail' latest_synthesis.pk %}">
+                <p class="synthesis-preview-phase">
+                    {{ latest_synthesis.get_phase_display }}
+                    {% if latest_synthesis.edited_text %}
+                        <span class="synthesis-preview-edited">&middot; edited</span>
+                    {% endif %}
+                </p>
+                <p class="synthesis-preview-when">
+                    Generated {{ latest_synthesis.created_at|date:"M j, g:i A" }}
+                </p>
+                <span class="button-link synthesis-preview-cta">Open</span>
+            </a>
+        </section>
+    {% endif %}
+
+    {% if attendee.non_session_time_budget %}
+        <section class="dashboard-budget">
+            <p class="dashboard-section-label">Non-session time</p>
+            <p class="dashboard-budget-text">
+                {{ attendee.non_session_time_budget|linebreaksbr }}
+            </p>
+            <a class="button-link" href="{% url 'arbiter:attendee_update' %}">Edit</a>
+        </section>
+    {% else %}
+        <section class="dashboard-budget dashboard-budget-empty">
+            <p class="dashboard-section-label">Non-session time</p>
+            <p class="dashboard-budget-text">
+                Optionally tell Arbiter when you'll be off the session
+                track (expo floor, networking, lunch). The before-phase
+                planner uses it to avoid recommending sessions during
+                your reserved time.
+            </p>
+            <a class="button-link" href="{% url 'arbiter:attendee_update' %}">
+                Add a time budget
+            </a>
+        </section>
+    {% endif %}
+
+    {# Inline JS for the AI trigger forms. Disables the submit button on  #}
+    {# click, swaps its label to "Generating recommendation...", and adds #}
+    {# an aria-busy attribute the CSS uses to pulse the button. The OpenRouter #}
+    {# call to LLaMA 3.3 70B can take 5-30 seconds; without this feedback the #}
+    {# user has no signal that their click registered and may re-click,     #}
+    {# stacking duplicate requests against the rate-limited free tier.     #}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const forms = document.querySelectorAll('.action-card-form');
+            forms.forEach(function (form) {
+                form.addEventListener('submit', function () {
+                    const button = form.querySelector('.action-card-button');
+                    if (!button) return;
+                    button.disabled = true;
+                    button.setAttribute('aria-busy', 'true');
+                    const label = button.querySelector('.action-label');
+                    const help = button.querySelector('.action-help');
+                    if (label) label.textContent = 'Generating recommendation';
+                    if (help) help.textContent = "This can take up to 30 seconds. Please don't close this tab.";
+                });
+            });
+        });
+    </script>
+
+    <div class="dashboard-recent">
+        <section class="dashboard-recent-block">
+            <div class="dashboard-recent-head">
+                <p class="dashboard-section-label">Recent sessions</p>
+                <a class="button-link" href="{% url 'arbiter:attendance_list' %}">View all</a>
+            </div>
+            {% if recent_logs %}
+                <ul class="dashboard-recent-list">
+                    {% for log in recent_logs %}
+                        <li class="dashboard-recent-item">
+                            <a href="{% url 'arbiter:attendance_update' log.pk %}">
+                                <p class="dashboard-recent-title">{{ log.session.title }}</p>
+                                <p class="dashboard-recent-meta">
+                                    {{ log.session.conference.name }}
+                                    &middot; {{ log.timestamp|date:"M j" }}
+                                </p>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="dashboard-recent-empty">
+                    Nothing logged yet. Browse the agenda to find a session.
+                </p>
+            {% endif %}
+        </section>
+
+        <section class="dashboard-recent-block">
+            <div class="dashboard-recent-head">
+                <p class="dashboard-section-label">Recent vendors</p>
+                <a class="button-link" href="{% url 'arbiter:vendor_list' %}">View all</a>
+            </div>
+            {% if recent_vendors %}
+                <ul class="dashboard-recent-list">
+                    {% for visit in recent_vendors %}
+                        <li class="dashboard-recent-item">
+                            <a href="{% url 'arbiter:vendor_update' visit.pk %}">
+                                <p class="dashboard-recent-title">{{ visit.vendor_name }}</p>
+                                <p class="dashboard-recent-meta">
+                                    {{ visit.category }}
+                                    &middot; {{ visit.timestamp|date:"M j" }}
+                                </p>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="dashboard-recent-empty">
+                    No booth visits logged yet.
+                </p>
+            {% endif %}
+        </section>
+    </div>
+</section>
+{% endblock %}

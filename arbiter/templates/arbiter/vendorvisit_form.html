@@ -1,0 +1,99 @@
+{# Author: Ian Sun | isun@bu.edu                                              #}
+{# Description: Shared template for VendorVisit Create and Update views.    #}
+{# Optimized for ~30-second mobile entry between sessions: vendor name,    #}
+{# category, notes, and tension_notes are surfaced by default. The         #}
+{# contradiction_flagged + contradiction_notes pair tucks behind an        #}
+{# advanced disclosure for the rare case where the user already knows what #}
+{# specifically contradicts what.                                           #}
+
+{% extends 'arbiter/base.html' %}
+
+{% block title %}
+    {% if form.instance.pk %}Edit vendor visit{% else %}Log a vendor{% endif %}
+    &middot; Arbiter
+{% endblock %}
+
+{% block content %}
+<section class="form-page">
+    <p class="eyebrow">Vendors</p>
+    <h1>
+        {% if form.instance.pk %}
+            Edit this vendor visit
+        {% else %}
+            Log a vendor
+        {% endif %}
+    </h1>
+
+    <p class="lede">
+        Quick capture of what the booth was pitching. Arbiter folds it
+        into the synthesis alongside your session notes.
+    </p>
+
+    <form method="post" action="" class="form stack" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="form-error" role="alert">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <label class="field">
+            <span class="field-label">{{ form.vendor_name.label }}</span>
+            <span class="field-help">{{ form.vendor_name.help_text }}</span>
+            {{ form.vendor_name }}
+            {% if form.vendor_name.errors %}
+                <span class="field-error">{{ form.vendor_name.errors|join:" " }}</span>
+            {% endif %}
+        </label>
+
+        <label class="field">
+            <span class="field-label">{{ form.category.label }}</span>
+            <span class="field-help">{{ form.category.help_text }}</span>
+            {{ form.category }}
+            {% if form.category.errors %}
+                <span class="field-error">{{ form.category.errors|join:" " }}</span>
+            {% endif %}
+        </label>
+
+        <label class="field">
+            <span class="field-label">{{ form.notes.label }}</span>
+            <span class="field-help">{{ form.notes.help_text }}</span>
+            {{ form.notes }}
+            {% if form.notes.errors %}
+                <span class="field-error">{{ form.notes.errors|join:" " }}</span>
+            {% endif %}
+        </label>
+
+        <label class="field tension-field">
+            <span class="field-label">{{ form.tension_notes.label }}</span>
+            <span class="field-help">{{ form.tension_notes.help_text }}</span>
+            {{ form.tension_notes }}
+            {% if form.tension_notes.errors %}
+                <span class="field-error">{{ form.tension_notes.errors|join:" " }}</span>
+            {% endif %}
+        </label>
+
+        <details class="advanced"
+                 {% if form.contradiction_flagged.value or form.instance.contradiction_flagged %}open{% endif %}>
+            <summary>Advanced: flag a specific contradiction</summary>
+            <div class="advanced-inner stack">
+                <p class="field-help">{{ form.contradiction_flagged.help_text }}</p>
+                <label class="check">
+                    {{ form.contradiction_flagged }}
+                    <span>{{ form.contradiction_flagged.label }}</span>
+                </label>
+                <label class="field">
+                    <span class="field-label">{{ form.contradiction_notes.label }}</span>
+                    {{ form.contradiction_notes }}
+                </label>
+            </div>
+        </details>
+
+        <div class="cta-row">
+            <button type="submit" class="button-primary">
+                {% if form.instance.pk %}Save changes{% else %}Save visit{% endif %}
+            </button>
+            <a class="button-link" href="{% url 'arbiter:vendor_list' %}">Cancel</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

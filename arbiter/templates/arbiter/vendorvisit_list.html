@@ -1,0 +1,69 @@
+{# Author: Ian Sun | isun@bu.edu                                              #}
+{# Description: Lists all of the signed-in user's VendorVisit rows, newest #}
+{# first. Each card shows the vendor name, category as a slate-blue topic  #}
+{# pill (matching session topic_area for visual consistency), a notes      #}
+{# preview, the tension marker if applicable, and edit / delete actions.   #}
+
+{% extends 'arbiter/base.html' %}
+
+{% block title %}Your vendor visits &middot; Arbiter{% endblock %}
+
+{% block content %}
+<section class="list-page">
+    <header class="page-header">
+        <p class="eyebrow">Vendors</p>
+        <h1>Booths you've visited</h1>
+        <p class="lede">
+            Quick captures from the expo floor, newest first. Arbiter
+            reads these alongside your session notes when building the
+            synthesis.
+        </p>
+        <div class="cta-row">
+            <a class="button-primary" href="{% url 'arbiter:vendor_create' %}">Log a vendor</a>
+        </div>
+    </header>
+
+    {% if visits %}
+        <ul class="log-list stack">
+            {% for visit in visits %}
+                <li class="log-item">
+                    <div class="log-meta">
+                        <span class="session-pill">{{ visit.category }}</span>
+                        <h2 class="log-title">{{ visit.vendor_name }}</h2>
+                        <p class="log-when">
+                            Logged {{ visit.timestamp|date:"D, M j, g:i A" }}
+                        </p>
+                    </div>
+
+                    <div class="log-status">
+                        {% if visit.tension_notes or visit.contradiction_flagged %}
+                            <span class="chip chip-tension"
+                                  title="Tension worth examining">Tension</span>
+                        {% endif %}
+                    </div>
+
+                    {% if visit.notes %}
+                        <p class="log-notes">{{ visit.notes|truncatewords:30 }}</p>
+                    {% endif %}
+
+                    <div class="log-actions">
+                        <a href="{% url 'arbiter:vendor_update' visit.pk %}">Edit</a>
+                        <a href="{% url 'arbiter:vendor_delete' visit.pk %}">Delete</a>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <div class="empty-state">
+            <p class="lede">
+                You haven't logged any vendor visits yet. Log a booth
+                conversation between sessions and it will feed the
+                synthesis.
+            </p>
+            <div class="cta-row">
+                <a class="button-primary" href="{% url 'arbiter:vendor_create' %}">Log your first vendor</a>
+            </div>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

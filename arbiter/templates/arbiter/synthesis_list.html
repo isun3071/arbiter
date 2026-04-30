@@ -1,0 +1,79 @@
+{# Author: Ian Sun | isun@bu.edu                                              #}
+{# Description: Chronological list of every Synthesis the user has         #}
+{# generated. Each card shows the phase as a slate-blue pill, conference, #}
+{# generation timestamp, an "Edited" tag if the user has saved an         #}
+{# edited_text version, and a snippet of the diagnosis. Click any card to #}
+{# open the full document at /arbiter/synthesis/<pk>/. The list reads as  #}
+{# a working-register history: notebook feel, dense, considered.           #}
+
+{% extends 'arbiter/base.html' %}
+
+{% block title %}Recommendation history &middot; Arbiter{% endblock %}
+
+{% block content %}
+<section class="list-page">
+    <header class="page-header">
+        <p class="eyebrow">History</p>
+        <h1>Your recommendations</h1>
+        <p class="lede">
+            Every synthesis Arbiter has generated for you, newest first.
+            Each entry is a snapshot of your thinking at that moment.
+        </p>
+    </header>
+
+    {% if syntheses %}
+        <ul class="log-list stack">
+            {% for synthesis in syntheses %}
+                <li class="log-item synthesis-history-item">
+                    <div class="log-meta">
+                        <span class="session-pill">{{ synthesis.get_phase_display }}</span>
+                        <h2 class="log-title">
+                            <a href="{% url 'arbiter:synthesis_detail' synthesis.pk %}">
+                                {{ synthesis.attendee.conference.name }}
+                            </a>
+                        </h2>
+                        <p class="log-when">
+                            Generated {{ synthesis.created_at|date:"D, M j, g:i A" }}
+                        </p>
+                    </div>
+
+                    <div class="log-status">
+                        {% if synthesis.edited_text %}
+                            <span class="chip chip-tension"
+                                  title="You saved an edited version of this draft">Edited</span>
+                        {% endif %}
+                    </div>
+
+                    {% if synthesis.content.diagnosis %}
+                        <p class="log-notes">
+                            {{ synthesis.content.diagnosis|truncatewords:30 }}
+                        </p>
+                    {% elif synthesis.content.parse_error %}
+                        <p class="log-notes">
+                            <em>The AI response could not be parsed. Open to view raw output.</em>
+                        </p>
+                    {% endif %}
+
+                    <div class="log-actions">
+                        <a href="{% url 'arbiter:synthesis_detail' synthesis.pk %}">Open</a>
+                        <a href="{% url 'arbiter:synthesis_update' synthesis.pk %}">
+                            {% if synthesis.edited_text %}Continue editing{% else %}Edit{% endif %}
+                        </a>
+                        <a href="{% url 'arbiter:synthesis_delete' synthesis.pk %}">Delete</a>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <div class="empty-state">
+            <p class="lede">
+                No recommendations generated yet. Trigger one from the
+                dashboard once you have a few sessions logged.
+            </p>
+            <div class="cta-row">
+                <a class="button-primary" href="{% url 'arbiter:dashboard' %}">Open dashboard</a>
+            </div>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

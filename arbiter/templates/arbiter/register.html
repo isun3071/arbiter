@@ -1,0 +1,147 @@
+{# Author: Ian Sun | isun@bu.edu                                              #}
+{# Description: Combined User + Attendee registration form. Grouped into    #}
+{# three fieldset sections (account, conference, context) so the field     #}
+{# count doesn't read as a wall of inputs. The board_question field gets   #}
+{# the same prominent slate-blue treatment used on the profile page since  #}
+{# it is the differentiator the whole product hangs off. A consent notice  #}
+{# above the submit button covers the data-handling disclosure required    #}
+{# by CLAUDE.md's privacy commitments.                                      #}
+
+{% extends 'arbiter/base.html' %}
+
+{% block title %}Sign up &middot; Arbiter{% endblock %}
+
+{% block content %}
+<section class="auth-form">
+    <p class="eyebrow">Sign up</p>
+    <h1>Get started</h1>
+    <p class="lede">
+        Set up an account, pick the conference you'll be attending, and
+        tell Arbiter what your board sent you to answer.
+    </p>
+
+    <form method="post" action="" class="form stack" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="form-error" role="alert">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <fieldset class="form-section">
+            <legend class="form-section-title">Account</legend>
+            <p class="form-section-help">How you'll sign in.</p>
+
+            <label class="field">
+                <span class="field-label">Username</span>
+                {{ form.username }}
+                {% if form.username.help_text %}
+                    <span class="field-help">{{ form.username.help_text|safe }}</span>
+                {% endif %}
+                {% if form.username.errors %}
+                    <span class="field-error">{{ form.username.errors|join:" " }}</span>
+                {% endif %}
+            </label>
+
+            <label class="field">
+                <span class="field-label">Email</span>
+                {% if form.email.help_text %}
+                    <span class="field-help">{{ form.email.help_text }}</span>
+                {% endif %}
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <span class="field-error">{{ form.email.errors|join:" " }}</span>
+                {% endif %}
+            </label>
+
+            <label class="field">
+                <span class="field-label">Password</span>
+                {{ form.password1 }}
+                {% if form.password1.help_text %}
+                    <span class="field-help">{{ form.password1.help_text|safe }}</span>
+                {% endif %}
+                {% if form.password1.errors %}
+                    <span class="field-error">{{ form.password1.errors|join:" " }}</span>
+                {% endif %}
+            </label>
+
+            <label class="field">
+                <span class="field-label">Confirm password</span>
+                {{ form.password2 }}
+                {% if form.password2.errors %}
+                    <span class="field-error">{{ form.password2.errors|join:" " }}</span>
+                {% endif %}
+            </label>
+        </fieldset>
+
+        <fieldset class="form-section">
+            <legend class="form-section-title">Your conference</legend>
+            <p class="form-section-help">Pick the event you'll be attending first.</p>
+
+            <label class="field">
+                <span class="field-label">Conference</span>
+                {% if form.conference.help_text %}
+                    <span class="field-help">{{ form.conference.help_text }}</span>
+                {% endif %}
+                {{ form.conference }}
+                {% if form.conference.errors %}
+                    <span class="field-error">{{ form.conference.errors|join:" " }}</span>
+                {% endif %}
+            </label>
+        </fieldset>
+
+        <fieldset class="form-section">
+            <legend class="form-section-title">Your context</legend>
+            <p class="form-section-help">Who you are and what your board needs.</p>
+
+            <label class="field">
+                <span class="field-label">{{ form.role.label }}</span>
+                <span class="field-help">{{ form.role.help_text }}</span>
+                {{ form.role }}
+                {% if form.role.errors %}
+                    <span class="field-error">{{ form.role.errors|join:" " }}</span>
+                {% endif %}
+            </label>
+
+            <label class="field">
+                <span class="field-label">{{ form.industry.label }}</span>
+                <span class="field-help">{{ form.industry.help_text }}</span>
+                {{ form.industry }}
+                {% if form.industry.errors %}
+                    <span class="field-error">{{ form.industry.errors|join:" " }}</span>
+                {% endif %}
+            </label>
+
+            <label class="field board-question-field">
+                <span class="field-label">{{ form.board_question.label|default:"What did your board send you to answer?" }}</span>
+                <span class="field-help">{{ form.board_question.help_text }}</span>
+                {{ form.board_question }}
+                {% if form.board_question.errors %}
+                    <span class="field-error">{{ form.board_question.errors|join:" " }}</span>
+                {% endif %}
+            </label>
+
+            <label class="field">
+                <span class="field-label">Bio</span>
+                <span class="field-help">{{ form.bio.help_text }}</span>
+                {{ form.bio }}
+                {% if form.bio.errors %}
+                    <span class="field-error">{{ form.bio.errors|join:" " }}</span>
+                {% endif %}
+            </label>
+        </fieldset>
+
+        <p class="consent-notice">
+            By creating an account you consent to Arbiter storing your
+            notes and organizational context to power the AI
+            recommendations described above. Your data is not sold or
+            shared with third parties. Deleting your account removes
+            every record associated with it.
+        </p>
+
+        <div class="cta-row">
+            <button type="submit" class="button-primary">Create account</button>
+            <a class="button-link" href="{% url 'arbiter:login' %}">Sign in instead</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

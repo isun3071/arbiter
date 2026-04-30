@@ -1,0 +1,124 @@
+{# Author: Ian Sun | isun@bu.edu                                              #}
+{# Description: Gap analysis report. Satisfies the assignment's "search /  #}
+{# filter producing a meaningful report" requirement. For each topic_area  #}
+{# the attendee has logs in, shows three counts: planned-and-attended,    #}
+{# planned-but-skipped, unplanned-drop-in. Filterable by topic; supports a #}
+{# text search across session titles, notes, tension_notes, and            #}
+{# contradiction_notes.                                                     #}
+
+{% extends 'arbiter/base.html' %}
+
+{% block title %}Gap analysis &middot; Arbiter{% endblock %}
+
+{% block content %}
+<section class="conference-page">
+    <header class="page-header">
+        <p class="eyebrow">Report</p>
+        <h1>Gap analysis</h1>
+        <p class="lede">
+            What you planned versus what you actually attended, broken
+            down by topic. Filter or search to narrow the report.
+        </p>
+    </header>
+
+    <form method="get" action="" class="filter-bar">
+        <label class="field">
+            <span class="field-label">Topic</span>
+            <select name="topic">
+                <option value="">All topics</option>
+                {% for topic in all_topics %}
+                    <option value="{{ topic }}"
+                            {% if topic == topic_filter %}selected{% endif %}>
+                        {{ topic }}
+                    </option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <label class="field">
+            <span class="field-label">Search</span>
+            <input type="search"
+                   name="q"
+                   value="{{ search_query }}"
+                   placeholder="Title, notes, tension...">
+        </label>
+
+        <div class="filter-actions">
+            <button type="submit" class="button-primary">Apply</button>
+            {% if topic_filter or search_query %}
+                <a class="button-link" href="{% url 'arbiter:gap_analysis' %}">Reset</a>
+            {% endif %}
+        </div>
+    </form>
+
+    <p class="session-count">
+        {{ total_logs }} log{{ total_logs|pluralize }} analyzed
+        {% if topic_filter or search_query %}match these filters{% else %}across all topics{% endif %}.
+    </p>
+
+    {% if breakdown %}
+        <div class="gap-table">
+            {% for row in breakdown %}
+                <article class="gap-row">
+                    <header class="gap-row-header">
+                        <span class="session-pill">{{ row.topic }}</span>
+                        <p class="gap-total">
+                            {{ row.total }} log{{ row.total|pluralize }}
+                        </p>
+                    </header>
+                    <div class="gap-counts">
+                        <div class="gap-count gap-count-attended">
+                            <p class="gap-count-num">{{ row.planned_attended }}</p>
+                            <p class="gap-count-label">Planned &amp; attended</p>
+                        </div>
+                        <div class="gap-count gap-count-skipped">
+                            <p class="gap-count-num">{{ row.planned_skipped }}</p>
+                            <p class="gap-count-label">Planned but skipped</p>
+                        </div>
+                        <div class="gap-count gap-count-unplanned">
+                            <p class="gap-count-num">{{ row.unplanned_attended }}</p>
+                            <p class="gap-count-label">Unplanned drop-ins</p>
+                        </div>
+                    </div>
+
+                    {% if row.logs %}
+                        <details class="gap-row-logs">
+                            <summary>
+                                See the {{ row.total }} log{{ row.total|pluralize }}
+                            </summary>
+                            <ul class="gap-log-list">
+                                {% for log in row.logs %}
+                                    <li class="gap-log-row">
+                                        <a href="{% url 'arbiter:attendance_update' log.pk %}">
+                                            <span class="gap-log-title">{{ log.session.title }}</span>
+                                            <span class="gap-log-status">
+                                                {% if log.planned %}planned{% endif %}{% if log.planned and log.attended %}, {% endif %}{% if log.attended %}attended{% endif %}{% if not log.planned and not log.attended %}neither{% endif %}
+                                            </span>
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </details>
+                    {% endif %}
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <p class="lede">
+                {% if topic_filter or search_query %}
+                    No logs match those filters.
+                {% else %}
+                    No logs yet. Log a few sessions and come back to
+                    see the breakdown.
+                {% endif %}
+            </p>
+            {% if topic_filter or search_query %}
+                <a class="button-link" href="{% url 'arbiter:gap_analysis' %}">Clear filters</a>
+            {% else %}
+                <a class="button-link" href="{% url 'arbiter:attendance_create' %}">Log a session</a>
+            {% endif %}
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

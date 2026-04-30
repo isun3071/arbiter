@@ -1,0 +1,41 @@
+{# Author: Ian Sun | isun@bu.edu                                              #}
+{# Description: Confirm-and-delete page for a VendorVisit. Surfaces the    #}
+{# vendor name and notes preview so the user can verify they're about to   #}
+{# remove the right row before pressing the destructive button.            #}
+
+{% extends 'arbiter/base.html' %}
+
+{% block title %}Delete vendor visit &middot; Arbiter{% endblock %}
+
+{% block content %}
+<section class="form-page">
+    <p class="eyebrow">Vendors</p>
+    <h1>Delete this vendor visit?</h1>
+
+    <p class="lede">
+        You are about to remove your visit to
+        <strong>{{ object.vendor_name }}</strong>. This cannot be undone.
+    </p>
+
+    <article class="log-summary">
+        <span class="session-pill">{{ object.category }}</span>
+        <p class="log-when">
+            Logged {{ object.timestamp|date:"D, M j, g:i A" }}
+        </p>
+        <div class="log-status">
+            {% if object.tension_notes or object.contradiction_flagged %}
+                <span class="chip chip-tension">Tension</span>
+            {% endif %}
+        </div>
+        {% if object.notes %}
+            <p class="log-notes">{{ object.notes|truncatewords:40 }}</p>
+        {% endif %}
+    </article>
+
+    <form method="post" action="" class="cta-row">
+        {% csrf_token %}
+        <button type="submit" class="button-primary button-danger">Yes, delete</button>
+        <a class="button-link" href="{% url 'arbiter:vendor_list' %}">Keep it</a>
+    </form>
+</section>
+{% endblock %}

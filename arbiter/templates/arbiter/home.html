@@ -1,0 +1,76 @@
+{# Author: Ian Sun | isun@bu.edu                                            #}
+{# Description: Public landing page for the Arbiter app. Anonymous          #}
+{# visitors see a value-prop hero with sign-in / register affordances;      #}
+{# signed-in users see entry points into their attendance log and the       #}
+{# conference browser. Uses the working-register design language defined    #}
+{# in arbiter.css.                                                          #}
+
+{% extends 'arbiter/base.html' %}
+
+{% block title %}Arbiter &mdash; board-ready conference takeaways{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <p class="eyebrow">Arbiter</p>
+    <h1>Conferences arrive as cacophony.<br><em>Leave with coherence.</em></h1>
+
+    <p class="lede">
+        Arbiter is for conference attendees whose board is waiting on a recommendation.
+        You take notes the way you normally do. Arbiter does the reasoning and produces
+        something you can present Monday morning.
+    </p>
+
+    {% if user.is_authenticated %}
+        <p class="cta-row">
+            <a class="button-primary" href="{% url 'arbiter:attendance_list' %}">
+                Open your attendance log
+            </a>
+            <a class="button-link" href="{% url 'arbiter:conference_list' %}">
+                Browse conferences
+            </a>
+        </p>
+    {% else %}
+        <p class="cta-row">
+            <a class="button-primary" href="{% url 'arbiter:register' %}">
+                Get started
+            </a>
+            <a class="button-link" href="{% url 'arbiter:login' %}">
+                Sign in
+            </a>
+        </p>
+    {% endif %}
+</section>
+
+<section class="how-it-works">
+    <h2>Three phases, one through-line</h2>
+    <div class="phase-grid">
+        <article class="phase">
+            <p class="phase-label">Before</p>
+            <h3>Plan against your mandate</h3>
+            <p>
+                Tell Arbiter the question your board sent you to answer. You'll get a
+                prioritized shortlist of sessions worth attending, reasoned against your
+                organizational context rather than the conference's marketing copy.
+            </p>
+        </article>
+        <article class="phase">
+            <p class="phase-label">During</p>
+            <h3>Notes, the way you normally take them</h3>
+            <p>
+                Log sessions as you go. A casual check-in catches what felt uneasy or
+                surprising, without needing you to articulate why. Arbiter tracks
+                tension across the day and recommends what to attend next.
+            </p>
+        </article>
+        <article class="phase">
+            <p class="phase-label">After</p>
+            <h3>One coherent deliverable</h3>
+            <p>
+                Three priorities for your board, the contradictions you encountered and
+                how they resolve, and talking points ready for Monday morning. You can
+                review and edit the draft before you present it.
+            </p>
+        </article>
+    </div>
+</section>
+{% endblock %}

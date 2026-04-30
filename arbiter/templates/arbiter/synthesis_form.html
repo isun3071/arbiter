@@ -1,0 +1,62 @@
+{# Author: Ian Sun | isun@bu.edu                                              #}
+{# Description: Edit form for Synthesis.edited_text. Renders a single      #}
+{# large textarea pre-populated with a plain-text version of the AI's     #}
+{# structured output. Catherine edits prose; she never has to touch JSON. #}
+{# The original AI draft (`content`) is preserved underneath and can be    #}
+{# inspected via the disclosure at the bottom.                             #}
+
+{% extends 'arbiter/base.html' %}
+
+{% block title %}Edit recommendation &middot; Arbiter{% endblock %}
+
+{% block content %}
+<section class="form-page">
+    <p class="eyebrow">Edit recommendation</p>
+    <h1>Refine this draft</h1>
+    <p class="lede">
+        The text below is the AI's first draft, formatted for reading.
+        Edit freely — adjust priorities, rephrase tensions, sharpen
+        talking points. Save to render the document with your edits.
+    </p>
+
+    <form method="post" action="" class="form stack" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="form-error" role="alert">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <label class="field synthesis-edit-field">
+            <span class="field-label">Recommendation</span>
+            <span class="field-help">
+                Plain text. Paragraphs are preserved on save. Citation
+                mentions ("your X log", "your visit to Y") will render
+                as text rather than clickable links once you save.
+                Section headings (uppercase) and numbered priorities
+                are conventions, not formatting requirements.
+            </span>
+            {{ form.edited_text }}
+            {% if form.edited_text.errors %}
+                <span class="field-error">{{ form.edited_text.errors|join:" " }}</span>
+            {% endif %}
+        </label>
+
+        <details class="advanced">
+            <summary>Compare against the AI's original draft</summary>
+            <div class="advanced-inner">
+                <p class="field-help">
+                    The original structured output is preserved
+                    underneath your edits. You can always reset to it
+                    by clearing the textarea above and saving.
+                </p>
+                <pre class="synthesis-raw">{{ object.content|stringformat:"s" }}</pre>
+            </div>
+        </details>
+
+        <div class="cta-row">
+            <button type="submit" class="button-primary">Save edits</button>
+            <a class="button-link" href="{% url 'arbiter:synthesis_detail' object.pk %}">Cancel</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

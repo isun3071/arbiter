@@ -1,0 +1,98 @@
+{# Author: Ian Sun | isun@bu.edu                                              #}
+{# Description: Conference detail page. Surfaces the conference's metadata    #}
+{# in the header and the full agenda below, regrouped by day so the time     #}
+{# axis reads as a working schedule rather than a flat list. Registered      #}
+{# users get quick CTAs into the logging surface.                             #}
+
+{% extends 'arbiter/base.html' %}
+
+{% block title %}{{ conference.name }} &middot; Arbiter{% endblock %}
+
+{% block content %}
+<section class="conference-page">
+    <header class="page-header">
+        <p class="eyebrow">Conference</p>
+        <h1>{{ conference.name }}</h1>
+        <p class="lede">
+            {{ conference.start_date|date:"l, F j" }}&ndash;{{ conference.end_date|date:"l, F j, Y" }}
+            &middot; {{ conference.location }}
+        </p>
+        {% if conference.description %}
+            <p class="conference-description">{{ conference.description }}</p>
+        {% endif %}
+
+        {% if is_registered %}
+            <div class="cta-row">
+                <a class="button-primary" href="{% url 'arbiter:attendance_create' %}">Log a session</a>
+                <a class="button-link" href="{% url 'arbiter:attendance_list' %}">My attendance</a>
+            </div>
+        {% endif %}
+    </header>
+
+    <section class="agenda">
+        <h2>Agenda</h2>
+        <p class="lede">
+            {{ sessions|length }} session{{ sessions|length|pluralize }} scheduled.
+            Click any session to read the description. Only one stays open at
+            a time so the agenda doesn't sprawl.
+        </p>
+
+        {# Outer regroup: split sessions by date so each conference day      #}
+        {# becomes its own header. The inner regroup splits each day's       #}
+        {# sessions into time blocks where concurrent sessions cluster       #}
+        {# together under one time label.                                    #}
+        {% regroup sessions by time_slot.date as day_groups %}
+
+        {% for day in day_groups %}
+            <div class="agenda-day">
+                <h3 class="agenda-day-title">
+                    {{ day.grouper|date:"l, F j" }}
+                </h3>
+
+                {% regroup day.list by time_slot as time_blocks %}
+                {% for time_block in time_blocks %}
+                    <div class="time-block">
+                        <p class="time-block-label">
+                            {{ time_block.grouper|date:"g:i A" }}
+                        </p>
+                        <div class="session-stack">
+                            {% for session in time_block.list %}
+                                {# name="agenda" makes every <details> on    #}
+                                {# this page mutually exclusive: opening     #}
+                                {# one closes any other that was open.       #}
+                                {# Native HTML, no JavaScript needed.         #}
+                                <details name="agenda" class="session-card">
+                                    <summary class="session-summary">
+                                        <div class="session-summary-content">
+                                            <div class="session-meta-row">
+                                                <span class="session-time">{{ session.time_slot|date:"g:i A" }}</span>
+                                                <span class="session-pill">{{ session.topic_area }}</span>
+                                            </div>
+                                            <span class="session-title">{{ session.title }}</span>
+                                            {% if session.speaker %}
+                                                <span class="session-speaker">{{ session.speaker }}</span>
+                                            {% endif %}
+                                        </div>
+                                        <span class="session-chevron" aria-hidden="true"></span>
+                                    </summary>
+                                    <div class="session-body">
+                                        {% if session.description %}
+                                            {{ session.description|linebreaks }}
+                                        {% else %}
+                                            <p class="field-help">No description provided for this session.</p>
+                                        {% endif %}
+                                    </div>
+                                </details>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% empty %}
+            <div class="empty-state">
+                <p class="lede">No sessions in the agenda yet.</p>
+            </div>
+        {% endfor %}
+    </section>
+</section>
+{% endblock %}

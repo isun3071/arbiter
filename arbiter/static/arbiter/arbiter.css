@@ -1,0 +1,2037 @@
+/*
+ * Author: Ian Sun | isun@bu.edu
+ * Description: Stylesheet for the arbiter app. Implements the working
+ * register of Arbiter's two-register design language: warm off-white
+ * background, deep charcoal ink, Inter sans-serif, slate-blue and
+ * amber accents reserved for AI provenance and tension flags
+ * respectively. The document register (Source Serif, generous spacing,
+ * cited sources) layers on top for synthesis output pages.
+ */
+
+
+/* ---- Tokens ----------------------------------------------------- */
+
+:root {
+    --bg: #FAF8F4;          /* warm off-white, not pure white */
+    --surface: #FFFFFF;     /* card surfaces atop the background */
+    --ink: #1A1F2E;         /* deep charcoal — primary text */
+    --ink-soft: #5C6370;    /* secondary text */
+    --rule: #E5E0D8;        /* hairline borders */
+    --ai: #3B5BA5;          /* slate blue — AI provenance, citations */
+    --tension: #C8853D;     /* amber — tension flags, "worth examining" */
+
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                 Roboto, sans-serif;
+    --font-serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 1rem;
+    --space-4: 1.5rem;
+    --space-5: 2.5rem;
+    --space-6: 4rem;
+
+    --content-width: 64rem;
+    --reading-width: 42rem;
+}
+
+
+/* ---- Reset ------------------------------------------------------ */
+
+*, *::before, *::after { box-sizing: border-box; }
+body, h1, h2, h3, h4, p, ul, ol, figure { margin: 0; padding: 0; }
+ul, ol { list-style: none; }
+a { color: inherit; text-decoration: none; }
+button {
+    font: inherit; color: inherit; background: none;
+    border: none; padding: 0; cursor: pointer;
+}
+img { max-width: 100%; display: block; }
+
+
+/* ---- Typography baseline --------------------------------------- */
+
+body {
+    font-family: var(--font-sans);
+    font-size: 17px;
+    line-height: 1.55;
+    color: var(--ink);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4 { font-weight: 600; line-height: 1.2; }
+h1 { font-size: 2.5rem; letter-spacing: -0.02em; }
+h2 { font-size: 1.625rem; letter-spacing: -0.015em; }
+h3 { font-size: 1.25rem; }
+h4 { font-size: 1rem; }
+
+p + p { margin-top: var(--space-3); }
+
+a { transition: color 120ms ease; }
+a:hover { color: var(--ai); }
+
+
+/* ---- Layout primitives ----------------------------------------- */
+
+.center {
+    width: 100%;
+    max-width: var(--content-width);
+    margin-inline: auto;
+    padding-inline: var(--space-3);
+}
+
+.skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    background: var(--ink);
+    color: var(--bg);
+    padding: var(--space-2) var(--space-3);
+    z-index: 1000;
+}
+.skip-link:focus { left: var(--space-2); top: var(--space-2); }
+
+
+/* ---- Header ---------------------------------------------------- */
+
+.site-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--rule);
+    padding-block: var(--space-4);
+}
+
+.header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+}
+
+.brand {
+    font-weight: 700;
+    font-size: 1.25rem;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+}
+
+.primary-nav {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.primary-nav a,
+.primary-nav .link-button {
+    font-size: 0.9375rem;
+    color: var(--ink-soft);
+}
+
+.primary-nav a:hover,
+.primary-nav .link-button:hover {
+    color: var(--ink);
+}
+
+.primary-nav .cta {
+    background: var(--ink);
+    color: var(--bg);
+    padding: var(--space-2) var(--space-3);
+    border-radius: 0.25rem;
+}
+
+.primary-nav .cta:hover {
+    background: var(--ai);
+    color: var(--bg);
+}
+
+.inline-form { display: inline; margin: 0; }
+
+
+/* ---- Main ------------------------------------------------------ */
+
+.site-main {
+    padding-block: var(--space-6);
+    min-height: 60vh;
+}
+
+
+/* ---- Hero ------------------------------------------------------ */
+
+.hero {
+    max-width: var(--reading-width);
+}
+
+.eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+    margin-bottom: var(--space-3);
+}
+
+.hero h1 em {
+    font-style: italic;
+    font-family: var(--font-serif);
+    font-weight: 400;
+}
+
+.lede {
+    margin-top: var(--space-4);
+    font-size: 1.0625rem;
+    color: var(--ink-soft);
+}
+
+.cta-row {
+    margin-top: var(--space-5);
+    display: flex;
+    gap: var(--space-4);
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+
+/* ---- Buttons --------------------------------------------------- */
+
+.button-primary {
+    background: var(--ink);
+    color: var(--bg);
+    padding: var(--space-2) var(--space-4);
+    border-radius: 0.25rem;
+    font-weight: 500;
+    transition: background 120ms ease;
+}
+.button-primary:hover {
+    background: var(--ai);
+    color: var(--bg);
+}
+
+.button-link {
+    color: var(--ai);
+    padding: var(--space-2) 0;
+    font-weight: 500;
+    border-bottom: 1px solid transparent;
+    transition: border-color 120ms ease;
+}
+.button-link:hover {
+    border-bottom-color: var(--ai);
+    color: var(--ai);
+}
+
+
+/* ---- Phase grid (home page) ----------------------------------- */
+
+.how-it-works {
+    margin-top: var(--space-6);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--rule);
+}
+
+.phase-grid {
+    margin-top: var(--space-4);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: var(--space-5);
+}
+
+.phase {
+    border-left: 2px solid var(--rule);
+    padding-left: var(--space-3);
+}
+
+.phase-label {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--ai);
+    margin-bottom: var(--space-2);
+}
+
+.phase h3 { margin-bottom: var(--space-2); }
+.phase p  { color: var(--ink-soft); font-size: 0.9375rem; }
+
+
+/* ---- Footer ---------------------------------------------------- */
+
+.site-footer {
+    border-top: 1px solid var(--rule);
+    padding-block: var(--space-4);
+    color: var(--ink-soft);
+    font-size: 0.875rem;
+    margin-top: var(--space-6);
+}
+
+
+/* ---- Layout primitives (cont.) -------------------------------- */
+
+/* Vertical rhythm without margin collapsing; every direct child gets a
+   consistent gap above the previous one. Used heavily on form pages. */
+.stack > * + * { margin-top: var(--space-3); }
+
+
+/* ---- Page header (list pages, form pages) --------------------- */
+
+.page-header {
+    padding-bottom: var(--space-5);
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: var(--space-5);
+}
+
+.page-header .eyebrow {
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    color: var(--ink-soft);
+    margin-bottom: var(--space-2);
+}
+
+.page-header h1 {
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    color: var(--ink);
+    margin: 0;
+}
+
+.page-header .lede {
+    margin-top: var(--space-3);
+    color: var(--ink-soft);
+    font-size: 1rem;
+    max-width: var(--reading-width);
+}
+
+
+/* ---- Form pages ----------------------------------------------- */
+
+.form-page,
+.auth-form {
+    max-width: var(--reading-width);
+    margin-inline: auto;
+}
+
+.form-page .lede,
+.auth-form .lede {
+    margin-bottom: var(--space-5);
+}
+
+/* The form's submit zone gets a hairline separator + extra padding so it
+   reads as the "close" of the form rather than another field. Notebook
+   feel: one considered visual break between editing and submitting,
+   without the heavier border that the conference detail's page-header
+   carries. */
+.form-page form > .cta-row {
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--rule);
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.field-label {
+    font-weight: 500;
+    font-size: 0.9375rem;
+}
+
+.field-help {
+    font-size: 0.875rem;
+    color: var(--ink-soft);
+    line-height: 1.45;
+}
+
+.field-error {
+    font-size: 0.875rem;
+    color: #B83A2C;
+}
+
+.form-error {
+    background: #FBE9E5;
+    border: 1px solid #F0BFB7;
+    color: #7A2A20;
+    padding: var(--space-3);
+    border-radius: 0.25rem;
+    font-size: 0.9375rem;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="datetime-local"],
+input[type="number"],
+input[type="search"],
+textarea,
+select {
+    font: inherit;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 0.25rem;
+    padding: var(--space-2) var(--space-3);
+    width: 100%;
+    transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="datetime-local"]:focus,
+input[type="number"]:focus,
+input[type="search"]:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: var(--ai);
+    box-shadow: 0 0 0 3px rgba(59, 91, 165, 0.18);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 5rem;
+    line-height: 1.55;
+    font-family: var(--font-sans);
+}
+
+.field-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+.check {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.9375rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.check input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+    accent-color: var(--ai);
+    transform: translateY(-1px);
+}
+
+/* The tension prompt earns the amber accent color on its label so the
+   field is visually anchored to the same "tension" semantic carried by
+   the chip and the contradiction marker on the synthesis page. */
+.tension-field .field-label {
+    color: var(--tension);
+}
+
+
+/* ---- Advanced disclosure (contradiction toggle) --------------- */
+
+.advanced {
+    border: 1px solid var(--rule);
+    border-radius: 0.25rem;
+    padding: var(--space-3);
+    background: var(--surface);
+}
+
+.advanced summary {
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--ink-soft);
+    font-size: 0.9375rem;
+    list-style: none;
+}
+
+.advanced summary::-webkit-details-marker { display: none; }
+
+.advanced summary::before {
+    content: '+';
+    display: inline-block;
+    width: 1rem;
+    color: var(--ink-soft);
+    font-weight: 600;
+}
+
+.advanced[open] summary::before { content: '\2212'; }
+
+.advanced summary:hover { color: var(--ink); }
+
+.advanced[open] summary {
+    color: var(--ink);
+    margin-bottom: var(--space-3);
+}
+
+.advanced-inner {
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--rule);
+}
+
+
+/* ---- Buttons (additions) -------------------------------------- */
+
+.button-danger {
+    background: #B83A2C;
+}
+
+.button-danger:hover {
+    background: #8E2C20;
+}
+
+
+/* ---- List pages (attendance log list, conference list) -------- */
+
+/* Working-register list pages constrain to reading width so the page
+   feels like a notebook rather than an enterprise dashboard. The
+   .page-header rule already supplies its own bottom border + margin,
+   so list-page only needs to set the page width. */
+.list-page {
+    max-width: var(--reading-width);
+    margin-inline: auto;
+}
+
+.log-list {
+    list-style: none;
+}
+
+/* Log items rest with a faint shadow and pick up a softer-border + small
+   shadow bump on hover. No translateY lift here — the card itself is
+   not a click target (the explicit Edit / Delete links are), so we
+   don't want to imply pressability the way the agenda's session cards
+   do. The hover is a "this is a card you can interact with" affordance,
+   not a "click the whole thing" one. */
+.log-item {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 0.5rem;
+    padding: var(--space-4);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--space-3);
+    grid-template-areas:
+        "meta status"
+        "notes notes"
+        "actions actions";
+    box-shadow: 0 1px 2px rgba(26, 31, 46, 0.04);
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.log-item:hover {
+    border-color: var(--ink-soft);
+    box-shadow: 0 2px 8px rgba(26, 31, 46, 0.06);
+}
+
+.log-meta { grid-area: meta; }
+
+.log-status {
+    grid-area: status;
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+.log-notes {
+    grid-area: notes;
+    color: var(--ink-soft);
+    font-size: 0.9375rem;
+    margin: 0;
+}
+
+.log-actions {
+    grid-area: actions;
+    display: flex;
+    gap: var(--space-3);
+    font-size: 0.875rem;
+    border-top: 1px solid var(--rule);
+    padding-top: var(--space-3);
+    margin-top: var(--space-1);
+}
+
+.log-actions a {
+    color: var(--ink-soft);
+}
+
+.log-actions a:hover { color: var(--ai); }
+
+.log-title {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    margin-block: var(--space-1) 0;
+}
+
+.log-when {
+    color: var(--ink-soft);
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+.conf-tag {
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--ai);
+    margin: 0;
+}
+
+
+/* ---- Status chips --------------------------------------------- */
+
+.chip {
+    font-size: 0.75rem;
+    padding: 0.125rem 0.5rem;
+    border-radius: 999px;
+    border: 1px solid var(--rule);
+    color: var(--ink-soft);
+    line-height: 1.5;
+    white-space: nowrap;
+}
+
+.chip-filled {
+    background: var(--ink);
+    color: var(--bg);
+    border-color: var(--ink);
+}
+
+.chip-tension {
+    background: rgba(200, 133, 61, 0.12);
+    color: var(--tension);
+    border-color: rgba(200, 133, 61, 0.4);
+}
+
+
+/* ---- Empty state ---------------------------------------------- */
+
+.empty-state {
+    background: var(--surface);
+    border: 1px dashed var(--rule);
+    border-radius: 0.5rem;
+    padding: var(--space-5);
+    text-align: center;
+}
+
+.empty-state .cta-row {
+    justify-content: center;
+}
+
+
+/* ---- Log summary (delete confirmation) ------------------------ */
+
+.log-summary {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 0.5rem;
+    padding: var(--space-4);
+    margin-block: var(--space-4);
+}
+
+.log-summary .log-status {
+    margin-block: var(--space-2);
+}
+
+
+/* ---- Accessibility ------------------------------------------- */
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+
+/* ---- Conference list ----------------------------------------- */
+
+.conference-list {
+    list-style: none;
+}
+
+.conference-card {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 0.5rem;
+    padding: var(--space-4);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--space-4);
+    align-items: start;
+}
+
+.conference-meta { min-width: 0; }
+
+.conference-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.conference-name a:hover { color: var(--ai); }
+
+.conference-when {
+    color: var(--ink-soft);
+    font-size: 0.875rem;
+    margin-top: var(--space-1);
+    margin-bottom: 0;
+}
+
+.conference-blurb {
+    color: var(--ink-soft);
+    font-size: 0.9375rem;
+    margin-top: var(--space-2);
+}
+
+.conference-aside {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--space-2);
+    text-align: right;
+}
+
+.conf-count {
+    color: var(--ink-soft);
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+
+/* ---- Conference detail / agenda ------------------------------ */
+
+/* Conference detail wants a document-feel narrow column rather than the
+   wider .center used by listing pages. Reading width keeps line lengths
+   in the comfortable 60-75 character range. */
+.conference-page {
+    max-width: var(--reading-width);
+    margin-inline: auto;
+}
+
+/* Description is body prose, not a metadata blurb — promote it to the
+   primary ink color and reading-typography line height. */
+.conference-description {
+    margin-top: var(--space-4);
+    color: var(--ink);
+    font-size: 1.0625rem;
+    line-height: 1.7;
+}
+
+.agenda {
+    margin-top: var(--space-6);
+}
+
+/* Agenda heading is a small label (the section is a list, not a chapter);
+   leave the visual weight to the per-day headings below. */
+.agenda > h2 {
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--ink-soft);
+    font-weight: 600;
+    margin-bottom: var(--space-2);
+}
+
+.agenda > .lede {
+    margin: 0 0 var(--space-5);
+    font-size: 0.9375rem;
+}
+
+.agenda-day {
+    margin-top: var(--space-6);
+}
+
+.agenda-day:first-of-type {
+    margin-top: var(--space-4);
+}
+
+/* Day heading is the major section header for the agenda. Sized like a
+   book chapter title, bordered below to anchor the day visually, and
+   left in primary ink rather than the muted label color so it earns
+   real weight on the page. */
+.agenda-day-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    text-transform: none;
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: var(--space-4);
+}
+
+.time-block {
+    margin-top: var(--space-4);
+}
+
+.time-block:first-of-type {
+    margin-top: var(--space-3);
+}
+
+/* Time labels are tabular-numerals so the AM/PM column lines up vertically
+   when the day has both 9:00 AM and 11:30 AM blocks side-by-side. */
+.time-block-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--ink);
+    margin: 0 0 var(--space-2);
+    font-variant-numeric: tabular-nums;
+}
+
+.session-stack > * + * {
+    margin-top: var(--space-2);
+}
+
+/* Cards rest with a soft shadow, lift slightly on hover (translateY plus
+   a deeper shadow), and settle into an open state with the strongest
+   visual weight. The progression gives three legible states: "this is a
+   card," "I'm pointing at this card," "this card is open." */
+.session-card {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 2px rgba(26, 31, 46, 0.04);
+    transition:
+        border-color 150ms ease,
+        box-shadow 150ms ease,
+        transform 150ms ease;
+    overflow: hidden;
+}
+
+.session-card:hover {
+    border-color: var(--ink-soft);
+    box-shadow: 0 4px 12px rgba(26, 31, 46, 0.08);
+    transform: translateY(-1px);
+}
+
+.session-card[open] {
+    border-color: var(--ink);
+    box-shadow: 0 2px 12px rgba(26, 31, 46, 0.08);
+    transform: none;
+}
+
+.session-summary {
+    cursor: pointer;
+    list-style: none;
+    padding: var(--space-4);
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+}
+
+.session-summary::-webkit-details-marker { display: none; }
+
+.session-summary-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+/* Top-of-card metadata row: start time and topic pill side by side.
+   Both small; both serve as quick-scan affordances above the title. */
+.session-meta-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-1);
+    flex-wrap: wrap;
+}
+
+.session-time {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--ink-soft);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Topic pill: thin slate-blue capsule. Reads as a category tag rather
+   than a status chip. Distinct from .chip because chips carry status
+   semantics (Planned / Attended / Tension); pills carry taxonomy. */
+.session-pill {
+    font-size: 0.6875rem;
+    padding: 0.125rem 0.625rem;
+    border-radius: 999px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ai);
+    border: 1px solid rgba(59, 91, 165, 0.25);
+    background: rgba(59, 91, 165, 0.04);
+    line-height: 1.5;
+    white-space: nowrap;
+}
+
+.session-title {
+    display: block;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--ink);
+}
+
+.session-speaker {
+    display: block;
+    color: var(--ink-soft);
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+/* Pure-CSS chevron rendered via two rotated borders. Lighter than an
+   inline SVG, swaps direction atomically with the [open] state, and
+   stays vertically aligned with the title's first line. */
+.session-chevron {
+    flex-shrink: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0.25rem;
+}
+
+.session-chevron::before {
+    content: '';
+    display: block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-right: 2px solid var(--ink-soft);
+    border-bottom: 2px solid var(--ink-soft);
+    transform: rotate(45deg) translate(-1px, -1px);
+    transition: transform 200ms ease, border-color 200ms ease;
+}
+
+.session-card[open] .session-chevron::before {
+    transform: rotate(-135deg) translate(-1px, -1px);
+    border-color: var(--ink);
+}
+
+.session-body {
+    padding: var(--space-3) var(--space-4) var(--space-4);
+    border-top: 1px solid var(--rule);
+    color: var(--ink);
+    font-size: 0.9375rem;
+    line-height: 1.65;
+}
+
+.session-body p + p {
+    margin-top: var(--space-3);
+}
+
+
+/* ---- Session list (cross-conference browse surface) ---------- */
+
+/* Filter bar reads as a small tools panel above the session list. Same
+   surface color as the cards below so the page feels continuous, but
+   visually separated by border + padding so the controls don't blur
+   into the list. Field labels are tighter than form-page fields here
+   because the bar is compact UI, not body forms. */
+.filter-bar {
+    display: flex;
+    gap: var(--space-3);
+    align-items: flex-end;
+    flex-wrap: wrap;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 0.5rem;
+    padding: var(--space-3);
+    margin-bottom: var(--space-3);
+}
+
+.filter-bar .field {
+    flex: 1;
+    min-width: 12rem;
+    gap: var(--space-1);
+}
+
+.filter-bar .field-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    color: var(--ink-soft);
+}
+
+.filter-actions {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.session-count {
+    color: var(--ink-soft);
+    font-size: 0.875rem;
+    margin: 0 0 var(--space-4);
+}
+
+/* Conference name appears as a small uppercase tag on each session card
+   in the cross-conference list. Distinct from .session-pill (topic) so
+   the eye can separate "where" from "what." */
+.session-conference {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+}
+
+/* Buttons inside an expanded session card sit below the description
+   with a hairline divider so the affordance reads as the card's "next
+   step" rather than another paragraph. */
+.session-body-actions {
+    margin-top: var(--space-4);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--rule);
+}
+
+
+/* ---- Session detail page ------------------------------------- */
+
+/* Linked breadcrumb in the eyebrow position. Subtle border-bottom on
+   hover so the affordance is visible without underlining the eyebrow
+   permanently. */
+.breadcrumb {
+    color: inherit;
+    border-bottom: 1px solid transparent;
+    transition: border-color 150ms ease, color 150ms ease;
+    padding-bottom: 1px;
+}
+
+.breadcrumb:hover {
+    color: var(--ai);
+    border-bottom-color: var(--ai);
+}
+
+.session-pill-inline {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 0.25rem;
+}
+
+.session-speaker-detail {
+    margin-top: var(--space-3);
+    color: var(--ink);
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.cta-meta {
+    color: var(--ink-soft);
+    font-size: 0.875rem;
+}
+
+.session-prose {
+    margin-top: var(--space-4);
+    color: var(--ink);
+    font-size: 1.0625rem;
+    line-height: 1.7;
+}
+
+.session-prose p + p {
+    margin-top: var(--space-3);
+}
+
+
+/* ---- Form sections (grouped fieldsets, used on registration) - */
+
+/* The registration form has nine fields, which would read as a wall of
+   inputs without visual grouping. Three fieldset sections (account /
+   conference / context) break that into legible chunks. The fieldset's
+   default border + padding is reset so the section reads as a soft
+   visual unit rather than a boxed control group. */
+.form-section {
+    border: none;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+}
+
+.form-section-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 600;
+    color: var(--ink-soft);
+    padding: 0;
+    margin: 0;
+    float: none;
+    width: auto;
+}
+
+.form-section-help {
+    color: var(--ink-soft);
+    font-size: 0.875rem;
+    margin: var(--space-1) 0 var(--space-3);
+}
+
+.form-section .field + .field {
+    margin-top: var(--space-3);
+}
+
+/* Hairline divider plus extra breathing room between sections so the
+   form reads as discrete steps rather than one long stack. */
+.form-section + .form-section {
+    margin-top: var(--space-5);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--rule);
+}
+
+
+/* ---- Consent notice (registration footer) ------------------- */
+
+/* Small-print disclosure required by the privacy commitments in
+   CLAUDE.md. Set apart from the form fields above with a dashed
+   border + subtle background so it reads as informational rather than
+   another input. */
+.consent-notice {
+    color: var(--ink-soft);
+    font-size: 0.8125rem;
+    line-height: 1.55;
+    padding: var(--space-3);
+    background: var(--bg);
+    border: 1px dashed var(--rule);
+    border-radius: 0.375rem;
+}
+
+
+/* ---- Dashboard (authenticated workspace) ---------------------- */
+
+/* The dashboard reuses the working-register reading width but layers in
+   a pull-quote treatment on board_question (italic Source Serif at a
+   larger size), an action-card row at the top, and two-column recent
+   activity sections. The only place outside the synthesis page where
+   the document register peeks through. */
+.dashboard {
+    max-width: var(--reading-width);
+    margin-inline: auto;
+}
+
+.dashboard-header h1 {
+    margin-top: var(--space-2);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+}
+
+.dashboard-header .lede {
+    margin-top: var(--space-2);
+    color: var(--ink-soft);
+    font-size: 0.9375rem;
+}
+
+/* board_question rendered as a pull quote: italic Source Serif with a
+   slate-blue left rule + soft tint background. The same accent color
+   used everywhere else for AI / categorization / document-register
+   peek so the visual language stays unified. */
+.board-question-quote {
+    background: rgba(59, 91, 165, 0.04);
+    border-left: 3px solid var(--ai);
+    border-radius: 0.375rem;
+    padding: var(--space-4) var(--space-5);
+    margin-block: var(--space-5);
+}
+
+.board-question-label {
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--ai);
+    margin: 0 0 var(--space-2);
+}
+
+.board-question-text {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1.375rem;
+    line-height: 1.4;
+    color: var(--ink);
+    margin: 0;
+}
+
+/* Three-up action grid that wraps on mobile. The primary card (Get my
+   board recommendation) inverts to ink-on-bg so it visually anchors
+   the row as the most important action. */
+.dashboard-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    gap: var(--space-3);
+    margin-block: var(--space-5);
+}
+
+.action-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 0.5rem;
+    padding: var(--space-4);
+    color: var(--ink);
+    text-decoration: none;
+    transition:
+        border-color 150ms ease,
+        box-shadow 150ms ease,
+        transform 150ms ease;
+}
+
+.action-card:hover {
+    border-color: var(--ink-soft);
+    box-shadow: 0 4px 12px rgba(26, 31, 46, 0.08);
+    transform: translateY(-1px);
+    color: var(--ink);
+}
+
+.action-card-primary {
+    background: var(--ink);
+    color: var(--bg);
+    border-color: var(--ink);
+}
+
+.action-card-primary:hover {
+    background: var(--ai);
+    border-color: var(--ai);
+    color: var(--bg);
+}
+
+.action-label {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.action-help {
+    color: var(--ink-soft);
+    font-size: 0.875rem;
+}
+
+.action-card-primary .action-help {
+    color: rgba(250, 248, 244, 0.75);
+}
+
+/* Section labels: small uppercase tracked, used for "Latest
+   recommendation," "Non-session time," "Recent sessions," "Recent
+   vendors." Same treatment as the eyebrow labels elsewhere; consistent
+   visual language. */
+.dashboard-section-label {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+    margin: 0 0 var(--space-2);
+}
+
+/* Latest synthesis preview card. Surfaces phase + when generated +
+   click-through. Lifts on hover same as action cards. */
+.dashboard-synthesis {
+    margin-block: var(--space-5);
+}
+
+.synthesis-preview {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 0.5rem;
+    padding: var(--space-4);
+    color: var(--ink);
+    text-decoration: none;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.synthesis-preview:hover {
+    border-color: var(--ink-soft);
+    box-shadow: 0 4px 12px rgba(26, 31, 46, 0.06);
+    color: var(--ink);
+}
+
+.synthesis-preview-phase {
+    font-weight: 600;
+    font-size: 1rem;
+    margin: 0;
+}
+
+.synthesis-preview-when {
+    color: var(--ink-soft);
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+.synthesis-preview-cta {
+    margin-top: var(--space-2);
+}
+
+/* Small "edited" indicator on the dashboard preview card so the user
+   knows at a glance whether the latest version is the AI's draft or
+   their own edit. Subtle tension-amber color matches the same chip
+   used elsewhere for tension/edit signals. */
+.synthesis-preview-edited {
+    color: var(--tension);
+    font-weight: 500;
+    font-size: 0.875rem;
+    margin-left: 0.25rem;
+}
+
+/* Non-session time budget block. Same surface card treatment as the
+   recent-activity blocks. The empty-state variant looks more inviting
+   (no chrome change, just the helpful prompt text) since most
+   first-time users won't have a budget set. */
+.dashboard-budget {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 0.5rem;
+    padding: var(--space-4);
+    margin-block: var(--space-4);
+}
+
+.dashboard-budget-empty {
+    border-style: dashed;
+}
+
+.dashboard-budget-text {
+    color: var(--ink);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    margin: 0 0 var(--space-2);
+}
+
+.dashboard-budget-empty .dashboard-budget-text {
+    color: var(--ink-soft);
+}
+
+/* Two-column "recent activity" block: sessions on the left, vendors on
+   the right. Collapses to a single column on phones. */
+.dashboard-recent {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    gap: var(--space-5);
+    margin-top: var(--space-5);
+}
+
+.dashboard-recent-block {
+    min-width: 0;
+}
+
+.dashboard-recent-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-2);
+}
+
+.dashboard-recent-head .dashboard-section-label {
+    margin-bottom: 0;
+}
+
+.dashboard-recent-list {
+    list-style: none;
+    border: 1px solid var(--rule);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background: var(--surface);
+}
+
+.dashboard-recent-item + .dashboard-recent-item {
+    border-top: 1px solid var(--rule);
+}
+
+.dashboard-recent-item a {
+    display: block;
+    padding: var(--space-3) var(--space-4);
+    color: var(--ink);
+    text-decoration: none;
+    transition: background 120ms ease;
+}
+
+.dashboard-recent-item a:hover {
+    background: rgba(26, 31, 46, 0.03);
+    color: var(--ink);
+}
+
+.dashboard-recent-title {
+    font-weight: 600;
+    font-size: 0.9375rem;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.dashboard-recent-meta {
+    color: var(--ink-soft);
+    font-size: 0.8125rem;
+    margin: var(--space-1) 0 0;
+}
+
+.dashboard-recent-empty {
+    color: var(--ink-soft);
+    font-size: 0.875rem;
+    border: 1px dashed var(--rule);
+    border-radius: 0.5rem;
+    padding: var(--space-3) var(--space-4);
+    margin: 0;
+}
+
+
+/* ---- Dashboard: button-styled action cards + secondary row ---- */
+
+/* The "Get my board recommendation" CTA on the dashboard is a POST
+   form (AI synthesis isn't idempotent — every click writes a new row),
+   so it has to be a button. The action-card-form + action-card-button
+   classes let the button mimic the same elevation and hover behavior
+   as the link-based action cards above. display: contents on the form
+   makes the button a direct child of the dashboard-actions grid so
+   the layout doesn't break. */
+.action-card-form {
+    display: contents;
+}
+
+.action-card-button {
+    border: 1px solid var(--rule);
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    font: inherit;
+}
+
+.dashboard-actions-secondary {
+    margin-block: var(--space-4);
+}
+
+/* The two before/during AI triggers are secondary actions. Quieter
+   resting state, same hover lift. */
+.action-card-quiet {
+    background: var(--bg);
+    border-style: dashed;
+}
+
+.action-card-quiet:hover {
+    background: var(--surface);
+    border-style: solid;
+}
+
+/* Loading state for AI trigger buttons. The OpenRouter call hangs the
+   browser for 5-30 seconds; without visible feedback the user thinks
+   the click did nothing. The JS in dashboard.html sets aria-busy on
+   submit; this rule pulses the button gently so it's clearly "working
+   on it" without being noisy. cursor: progress is the OS-level signal
+   that the user should wait. */
+.action-card-button:disabled,
+.action-card-button[aria-busy="true"] {
+    cursor: progress;
+    pointer-events: none;
+    transform: none;
+    animation: action-card-pulse 1.6s ease-in-out infinite;
+}
+
+.action-card-button[aria-busy="true"] .action-label::after {
+    content: '';
+    display: inline-block;
+    width: 0.4em;
+    height: 0.4em;
+    margin-left: 0.5em;
+    margin-bottom: 0.1em;
+    border-radius: 50%;
+    background: currentColor;
+    vertical-align: middle;
+    animation: dot-blink 1.2s ease-in-out infinite;
+}
+
+@keyframes action-card-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+@keyframes dot-blink {
+    0%, 100% { transform: scale(0.6); opacity: 0.4; }
+    50% { transform: scale(1.2); opacity: 1; }
+}
+
+
+/* ---- Synthesis page (document register) ---------------------- */
+
+/* The synthesis page is the only surface that lives in the document
+   register: serif body, generous line-height, numbered priorities with
+   serif numerals, hairline section dividers. Reading-width column. */
+.synthesis-document {
+    max-width: 45rem;
+    margin-inline: auto;
+    font-family: var(--font-serif);
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    color: var(--ink);
+}
+
+.synthesis-header {
+    padding-bottom: var(--space-5);
+    border-bottom: 2px solid var(--ink);
+    margin-bottom: var(--space-6);
+}
+
+.synthesis-header .eyebrow {
+    /* Eyebrow stays sans for typographic contrast against the serif
+       title below it. */
+    font-family: var(--font-sans);
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--ink-soft);
+    font-weight: 600;
+    margin-bottom: var(--space-2);
+}
+
+.synthesis-title {
+    font-family: var(--font-serif);
+    font-size: 2.5rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+    margin: 0;
+    color: var(--ink);
+}
+
+.synthesis-byline {
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    color: var(--ink-soft);
+    margin-top: var(--space-3);
+    margin-bottom: 0;
+}
+
+.synthesis-edited {
+    color: var(--tension);
+    font-weight: 600;
+}
+
+.synthesis-board-question {
+    background: rgba(59, 91, 165, 0.04);
+    border-left: 3px solid var(--ai);
+    border-radius: 0.375rem;
+    padding: var(--space-4) var(--space-5);
+    margin: var(--space-5) 0 0;
+}
+
+.synthesis-board-question .board-question-label {
+    font-family: var(--font-sans);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--ai);
+    margin: 0 0 var(--space-2);
+}
+
+.synthesis-board-question .board-question-text {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1.25rem;
+    line-height: 1.4;
+    color: var(--ink);
+    margin: 0;
+}
+
+.synthesis-section {
+    margin-bottom: var(--space-6);
+}
+
+.synthesis-section-label {
+    font-family: var(--font-sans);
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--ink-soft);
+    font-weight: 600;
+    margin: 0 0 var(--space-2);
+}
+
+.synthesis-section-title {
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0 0 var(--space-4);
+    line-height: 1.25;
+    color: var(--ink);
+}
+
+.synthesis-section-note {
+    font-family: var(--font-sans);
+    color: var(--ink-soft);
+    font-size: 0.9375rem;
+    margin: calc(var(--space-4) * -1 + var(--space-1)) 0 var(--space-4);
+}
+
+.synthesis-prose {
+    font-style: italic;
+    color: var(--ink);
+    margin: 0;
+}
+
+/* Numbered priority list. Counter renders the numeral in serif at a
+   large size, slate-blue, hanging in the left margin. Reads like a
+   formal report rather than a bulleted list. */
+.priority-list {
+    counter-reset: priority;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.priority-item {
+    counter-increment: priority;
+    margin-bottom: var(--space-5);
+    padding-left: 3rem;
+    position: relative;
+}
+
+.priority-item::before {
+    content: counter(priority);
+    position: absolute;
+    left: 0;
+    top: -0.25rem;
+    font-family: var(--font-serif);
+    font-size: 2.25rem;
+    font-weight: 600;
+    color: var(--ai);
+    line-height: 1;
+}
+
+.priority-title {
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 var(--space-2);
+    line-height: 1.3;
+    color: var(--ink);
+}
+
+.priority-rationale {
+    color: var(--ink);
+    margin: 0;
+}
+
+/* Citation footnote rendered after each priority and contradiction
+   when the AI populated supporting_log_ids or supporting_vendor_ids.
+   Sans-serif, slate-blue, smaller — clearly secondary to the prose
+   above. The links inside are underlined on hover so it's obvious
+   they're navigable, not just colored text. */
+.synthesis-citations {
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    color: var(--ai);
+    margin: var(--space-2) 0 0;
+}
+
+.synthesis-citations a {
+    color: var(--ai);
+    border-bottom: 1px solid transparent;
+    transition: border-color 120ms ease;
+}
+
+.synthesis-citations a:hover {
+    border-bottom-color: var(--ai);
+    color: var(--ai);
+}
+
+/* Contradiction block: amber left rule (the tension semantic) plus
+   "between" line in heavier weight, "resolution" line below in body
+   prose. */
+.synthesis-contradiction {
+    border-left: 3px solid var(--tension);
+    padding-left: var(--space-4);
+    margin-bottom: var(--space-5);
+}
+
+.contradiction-between {
+    font-weight: 600;
+    margin: 0 0 var(--space-2);
+}
+
+.contradiction-resolution {
+    color: var(--ink);
+    margin: 0;
+}
+
+.replan-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.replan-item {
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-3);
+    border-left: 2px solid var(--rule);
+}
+
+.replan-action {
+    font-weight: 600;
+    color: var(--ai);
+    margin-right: 0.25em;
+}
+
+.talking-points {
+    list-style: square;
+    padding-left: 1.5rem;
+    margin: 0;
+}
+
+.talking-points li {
+    margin-bottom: var(--space-2);
+}
+
+.synthesis-warning {
+    background: rgba(200, 133, 61, 0.08);
+    border-left: 3px solid var(--tension);
+    padding: var(--space-3) var(--space-4);
+    margin-block: var(--space-4);
+    border-radius: 0.25rem;
+}
+
+.synthesis-warning-text {
+    font-family: var(--font-sans);
+    margin: 0;
+    color: var(--ink);
+    font-size: 0.9375rem;
+}
+
+.synthesis-error {
+    background: #FBE9E5;
+    border: 1px solid #F0BFB7;
+    color: #7A2A20;
+    padding: var(--space-4);
+    border-radius: 0.5rem;
+    font-family: var(--font-sans);
+}
+
+.synthesis-raw {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo,
+                 Monaco, Consolas, monospace;
+    font-size: 0.8125rem;
+    background: var(--bg);
+    padding: var(--space-3);
+    border-radius: 0.25rem;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    line-height: 1.5;
+}
+
+.synthesis-footer {
+    margin-top: var(--space-6);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--rule);
+    font-family: var(--font-sans);
+}
+
+.synthesis-disclosure {
+    margin-top: var(--space-3);
+    margin-bottom: var(--space-2);
+    font-size: 0.8125rem;
+    color: var(--ink-soft);
+    line-height: 1.55;
+}
+
+.synthesis-meta {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--ink-soft);
+}
+
+/* Edited-document rendering. When Catherine has saved an edited_text,
+   the detail page renders her prose directly with `linebreaks` —
+   paragraphs become <p> tags, single newlines become <br>. The
+   container keeps the document register (serif body, generous
+   line-height) so it reads as a continuation of the rendered draft,
+   not as a different page type. Section headings she keeps in the
+   text (uppercase) remain inline in the prose — we don't try to
+   parse them out. */
+.synthesis-edited-document {
+    color: var(--ink);
+    font-family: var(--font-serif);
+    font-size: 1.0625rem;
+    line-height: 1.7;
+}
+
+.synthesis-edited-document p {
+    margin-bottom: var(--space-3);
+}
+
+/* The edit textarea is large by default so Catherine can see most of
+   the rendered draft without scrolling. Monospace font would be wrong
+   here — she's editing prose, not code — so it stays in the
+   working-register sans-serif. Generous line-height makes it readable
+   while editing. */
+.synthesis-textarea {
+    min-height: 32rem;
+    font-family: var(--font-sans);
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    padding: var(--space-4);
+}
+
+/* Print styles. The synthesis page is meant to be Cmd+P-able into a
+   clean PDF — strip nav, footer, and edit affordances; let the document
+   itself fill the printed page. */
+@media print {
+    .no-print,
+    .site-header,
+    .site-footer { display: none; }
+    body { background: white; color: black; }
+    .synthesis-document { max-width: none; }
+    a { color: inherit; text-decoration: none; }
+}
+
+
+/* ---- Gap analysis report ------------------------------------- */
+
+.gap-table {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.gap-row {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 0.5rem;
+    padding: var(--space-4);
+}
+
+.gap-row-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+    flex-wrap: wrap;
+}
+
+.gap-total {
+    color: var(--ink-soft);
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+/* Three-column counts. Each column has a large numeral and a small
+   label below. The skipped and unplanned variants get a hairline tint
+   so the row visually surfaces gaps vs. on-plan attendance. */
+.gap-counts {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-3);
+}
+
+.gap-count {
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    border-radius: 0.375rem;
+    padding: var(--space-3);
+    text-align: center;
+}
+
+.gap-count-num {
+    font-family: var(--font-serif);
+    font-size: 1.875rem;
+    font-weight: 600;
+    line-height: 1;
+    margin: 0 0 var(--space-1);
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+}
+
+.gap-count-label {
+    font-size: 0.75rem;
+    color: var(--ink-soft);
+    margin: 0;
+    line-height: 1.3;
+}
+
+.gap-count-skipped {
+    background: rgba(200, 133, 61, 0.06);
+    border-color: rgba(200, 133, 61, 0.25);
+}
+
+.gap-count-skipped .gap-count-num {
+    color: var(--tension);
+}
+
+.gap-count-unplanned {
+    background: rgba(59, 91, 165, 0.04);
+    border-color: rgba(59, 91, 165, 0.2);
+}
+
+.gap-count-unplanned .gap-count-num {
+    color: var(--ai);
+}
+
+.gap-row-logs {
+    margin-top: var(--space-3);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--rule);
+}
+
+.gap-row-logs summary {
+    cursor: pointer;
+    color: var(--ink-soft);
+    font-size: 0.875rem;
+    list-style: none;
+}
+
+.gap-row-logs summary::-webkit-details-marker { display: none; }
+
+.gap-row-logs summary::before {
+    content: '+';
+    margin-right: 0.5rem;
+    color: var(--ink-soft);
+}
+
+.gap-row-logs[open] summary::before { content: '\2212'; }
+
+.gap-row-logs summary:hover { color: var(--ink); }
+
+.gap-log-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-3) 0 0;
+}
+
+.gap-log-row a {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-2) 0;
+    color: var(--ink);
+    border-bottom: 1px solid var(--rule);
+}
+
+.gap-log-row:last-child a {
+    border-bottom: none;
+}
+
+.gap-log-row a:hover { color: var(--ai); }
+
+.gap-log-title {
+    font-size: 0.9375rem;
+    font-weight: 500;
+}
+
+.gap-log-status {
+    color: var(--ink-soft);
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+}
+
+
+/* ---- Profile form: prominent board_question field ------------ */
+
+/* board_question is the differentiator the whole product hangs off, so
+   it gets a slate-blue tinted card treatment to mark it as the
+   centerpiece of the form. Heavier-weight label and a slightly larger
+   textarea make it visually unmistakable without breaking the form's
+   notebook flow. */
+.board-question-field {
+    padding: var(--space-4);
+    background: rgba(59, 91, 165, 0.04);
+    border: 1px solid rgba(59, 91, 165, 0.2);
+    border-left: 3px solid var(--ai);
+    border-radius: 0.375rem;
+}
+
+.board-question-field .field-label {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.board-question-field textarea {
+    background: var(--surface);
+    min-height: 6rem;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+
+/* ---- Mobile breakpoint ---------------------------------------- */
+
+@media (max-width: 640px) {
+    body { font-size: 16px; }
+    h1 { font-size: 1.875rem; }
+    h2 { font-size: 1.375rem; }
+
+    .header-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-2);
+    }
+
+    .primary-nav { gap: var(--space-2); }
+
+    /* On phones the log card collapses to a single column so the status
+       chips wrap below the title rather than fighting for horizontal
+       space against it. */
+    .log-item {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "meta"
+            "status"
+            "notes"
+            "actions";
+    }
+
+    /* The conference card and the agenda session row both collapse from
+       a horizontal grid to a left-aligned vertical stack on phones. */
+    .conference-card {
+        grid-template-columns: 1fr;
+    }
+    .conference-aside {
+        align-items: flex-start;
+        text-align: left;
+    }
+
+    /* On phones the session card's summary collapses gap so the chip
+       and toggle don't push too far from the title. The chip can wrap
+       below the title if space gets really tight. */
+    .session-summary {
+        gap: var(--space-3);
+    }
+
+    /* Filter bar drops to a single column so the dropdowns and the
+       Apply / Reset buttons stack vertically. Each field takes the full
+       width of the bar instead of competing for horizontal space. */
+    .filter-bar .field {
+        flex: 1 1 100%;
+    }
+
+    .filter-actions {
+        width: 100%;
+    }
+
+    /* Gap analysis triple count grid collapses to single column so the
+       big numerals don't get squeezed. */
+    .gap-counts {
+        grid-template-columns: 1fr;
+    }
+
+    /* Synthesis title smaller on mobile so it fits without wrapping
+       awkwardly when the title is long. */
+    .synthesis-title {
+        font-size: 1.875rem;
+    }
+
+    .priority-item {
+        padding-left: 2.5rem;
+    }
+
+    .priority-item::before {
+        font-size: 1.875rem;
+    }
+}

@@ -1,0 +1,78 @@
+{# Author: Ian Sun | isun@bu.edu                                              #}
+{# Description: Profile edit page. Renders the AttendeeForm with the       #}
+{# board_question field given visually distinct treatment so it reads as   #}
+{# the centerpiece of the page. The other fields (role, industry, bio) sit #}
+{# above and below as supporting context.                                   #}
+
+{% extends 'arbiter/base.html' %}
+
+{% block title %}Your profile &middot; Arbiter{% endblock %}
+
+{% block content %}
+<section class="form-page">
+    <p class="eyebrow">Profile</p>
+    <h1>Your context</h1>
+    <p class="lede">
+        These fields shape every recommendation Arbiter makes for you. The
+        board question is the most important one on the page.
+    </p>
+
+    <form method="post" action="" class="form stack" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="form-error" role="alert">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <label class="field">
+            <span class="field-label">{{ form.role.label }}</span>
+            <span class="field-help">{{ form.role.help_text }}</span>
+            {{ form.role }}
+            {% if form.role.errors %}
+                <span class="field-error">{{ form.role.errors|join:" " }}</span>
+            {% endif %}
+        </label>
+
+        <label class="field">
+            <span class="field-label">{{ form.industry.label }}</span>
+            <span class="field-help">{{ form.industry.help_text }}</span>
+            {{ form.industry }}
+            {% if form.industry.errors %}
+                <span class="field-error">{{ form.industry.errors|join:" " }}</span>
+            {% endif %}
+        </label>
+
+        <label class="field board-question-field">
+            <span class="field-label">{{ form.board_question.label }}</span>
+            <span class="field-help">{{ form.board_question.help_text }}</span>
+            {{ form.board_question }}
+            {% if form.board_question.errors %}
+                <span class="field-error">{{ form.board_question.errors|join:" " }}</span>
+            {% endif %}
+        </label>
+
+        <label class="field">
+            <span class="field-label">{{ form.bio.label }}</span>
+            <span class="field-help">{{ form.bio.help_text }}</span>
+            {{ form.bio }}
+            {% if form.bio.errors %}
+                <span class="field-error">{{ form.bio.errors|join:" " }}</span>
+            {% endif %}
+        </label>
+
+        <label class="field">
+            <span class="field-label">{{ form.non_session_time_budget.label }}</span>
+            <span class="field-help">{{ form.non_session_time_budget.help_text }}</span>
+            {{ form.non_session_time_budget }}
+            {% if form.non_session_time_budget.errors %}
+                <span class="field-error">{{ form.non_session_time_budget.errors|join:" " }}</span>
+            {% endif %}
+        </label>
+
+        <div class="cta-row">
+            <button type="submit" class="button-primary">Save profile</button>
+            <a class="button-link" href="{% url 'arbiter:home' %}">Cancel</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

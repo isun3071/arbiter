@@ -1,0 +1,49 @@
+{# Author: Ian Sun | isun@bu.edu                                              #}
+{# Description: Confirm-and-delete page for a Synthesis. Surfaces phase,   #}
+{# generation timestamp, edited tag if present, and a snippet of the      #}
+{# diagnosis so the user can verify they're deleting the right row before #}
+{# pressing the destructive button. Safe to delete — no other model       #}
+{# depends on Synthesis.                                                   #}
+
+{% extends 'arbiter/base.html' %}
+
+{% block title %}Delete recommendation &middot; Arbiter{% endblock %}
+
+{% block content %}
+<section class="form-page">
+    <p class="eyebrow">History</p>
+    <h1>Delete this recommendation?</h1>
+
+    <p class="lede">
+        You are about to remove your
+        <strong>{{ object.get_phase_display|lower }}</strong>
+        from {{ object.created_at|date:"F j, Y" }}. This cannot be
+        undone. The AttendanceLogs and VendorVisits this recommendation
+        cited stay intact.
+    </p>
+
+    <article class="log-summary">
+        <span class="session-pill">{{ object.get_phase_display }}</span>
+        <p class="log-when">
+            Generated {{ object.created_at|date:"D, M j, g:i A" }}
+            {% if object.edited_text %}
+                &middot; <span class="synthesis-edited">edited</span>
+            {% endif %}
+        </p>
+        {% if object.content.diagnosis %}
+            <p class="log-notes">{{ object.content.diagnosis|truncatewords:30 }}</p>
+        {% elif object.content.parse_error %}
+            <p class="log-notes">
+                <em>This synthesis had a parse error and contains only
+                raw model output.</em>
+            </p>
+        {% endif %}
+    </article>
+
+    <form method="post" action="" class="cta-row">
+        {% csrf_token %}
+        <button type="submit" class="button-primary button-danger">Yes, delete</button>
+        <a class="button-link" href="{% url 'arbiter:synthesis_detail' object.pk %}">Keep it</a>
+    </form>
+</section>
+{% endblock %}

@@ -1,0 +1,69 @@
+{# Author: Ian Sun | isun@bu.edu                                              #}
+{# Description: Lists all of the signed-in user's AttendanceLog rows across  #}
+{# every Attendee registration they hold, newest first. Each row surfaces    #}
+{# session title, conference, time slot, planned/attended status chips, a    #}
+{# tension marker if the row has tension_notes or a manual contradiction     #}
+{# flag, a notes preview, and edit / delete affordances.                      #}
+
+{% extends 'arbiter/base.html' %}
+
+{% block title %}Your attendance &middot; Arbiter{% endblock %}
+
+{% block content %}
+<section class="list-page">
+    <header class="page-header">
+        <p class="eyebrow">My attendance</p>
+        <h1>Your sessions, logged</h1>
+        <p class="lede">
+            Everything you have recorded across the conferences you are
+            registered for, newest first.
+        </p>
+        <div class="cta-row">
+            <a class="button-primary" href="{% url 'arbiter:attendance_create' %}">Log a session</a>
+            <a class="button-link" href="{% url 'arbiter:gap_analysis' %}">Open gap analysis</a>
+        </div>
+    </header>
+
+    {% if logs %}
+        <ul class="log-list stack">
+            {% for log in logs %}
+                <li class="log-item">
+                    <div class="log-meta">
+                        <p class="conf-tag">{{ log.session.conference.name }}</p>
+                        <h2 class="log-title">{{ log.session.title }}</h2>
+                        <p class="log-when">{{ log.session.time_slot|date:"D, M j, g:i A" }}</p>
+                    </div>
+
+                    <div class="log-status">
+                        {% if log.planned %}<span class="chip">Planned</span>{% endif %}
+                        {% if log.attended %}<span class="chip chip-filled">Attended</span>{% endif %}
+                        {% if log.tension_notes or log.contradiction_flagged %}
+                            <span class="chip chip-tension" title="Tension worth examining">Tension</span>
+                        {% endif %}
+                    </div>
+
+                    {% if log.notes %}
+                        <p class="log-notes">{{ log.notes|truncatewords:30 }}</p>
+                    {% endif %}
+
+                    <div class="log-actions">
+                        <a href="{% url 'arbiter:attendance_update' log.pk %}">Edit</a>
+                        <a href="{% url 'arbiter:attendance_delete' log.pk %}">Delete</a>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <div class="empty-state">
+            <p class="lede">
+                You have not logged anything yet. Pick a session from the
+                agenda and record what you took from it.
+            </p>
+            <div class="cta-row">
+                <a class="button-primary" href="{% url 'arbiter:attendance_create' %}">Log your first session</a>
+                <a class="button-link" href="{% url 'arbiter:session_list' %}">Browse the agenda</a>
+            </div>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

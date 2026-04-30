@@ -1,0 +1,99 @@
+{# Author: Ian Sun | isun@bu.edu                                              #}
+{# Description: Shared template for AttendanceLog Create and Update views.    #}
+{# Renders the working-register form: session select, planned/attended       #}
+{# toggles, casual notes textarea, casual tension_notes prompt, and an       #}
+{# advanced disclosure containing the power-user contradiction toggle.        #}
+
+{% extends 'arbiter/base.html' %}
+
+{% block title %}
+    {% if form.instance.pk %}Edit log{% else %}Log a session{% endif %}
+    &middot; Arbiter
+{% endblock %}
+
+{% block content %}
+<section class="form-page">
+    <p class="eyebrow">My attendance</p>
+    <h1>
+        {% if form.instance.pk %}
+            Edit this log
+        {% else %}
+            Log a session
+        {% endif %}
+    </h1>
+
+    <p class="lede">
+        Capture this the way you would take any other notes. Arbiter handles
+        the analysis later.
+    </p>
+
+    <form method="post" action="" class="form stack" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="form-error" role="alert">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <label class="field">
+            <span class="field-label">{{ form.session.label }}</span>
+            {{ form.session }}
+            {% if form.session.errors %}
+                <span class="field-error">{{ form.session.errors|join:" " }}</span>
+            {% endif %}
+        </label>
+
+        <fieldset class="field-row">
+            <legend class="visually-hidden">Attendance status</legend>
+            <label class="check">
+                {{ form.planned }}
+                <span>{{ form.planned.label }}</span>
+            </label>
+            <label class="check">
+                {{ form.attended }}
+                <span>{{ form.attended.label }}</span>
+            </label>
+        </fieldset>
+
+        <label class="field">
+            <span class="field-label">{{ form.notes.label }}</span>
+            <span class="field-help">{{ form.notes.help_text }}</span>
+            {{ form.notes }}
+            {% if form.notes.errors %}
+                <span class="field-error">{{ form.notes.errors|join:" " }}</span>
+            {% endif %}
+        </label>
+
+        <label class="field tension-field">
+            <span class="field-label">{{ form.tension_notes.label }}</span>
+            <span class="field-help">{{ form.tension_notes.help_text }}</span>
+            {{ form.tension_notes }}
+            {% if form.tension_notes.errors %}
+                <span class="field-error">{{ form.tension_notes.errors|join:" " }}</span>
+            {% endif %}
+        </label>
+
+        <details class="advanced"
+                 {% if form.contradiction_flagged.value or form.instance.contradiction_flagged %}open{% endif %}>
+            <summary>Advanced: flag a specific contradiction</summary>
+            <div class="advanced-inner stack">
+                <p class="field-help">{{ form.contradiction_flagged.help_text }}</p>
+                <label class="check">
+                    {{ form.contradiction_flagged }}
+                    <span>{{ form.contradiction_flagged.label }}</span>
+                </label>
+                <label class="field">
+                    <span class="field-label">{{ form.contradiction_notes.label }}</span>
+                    {{ form.contradiction_notes }}
+                </label>
+            </div>
+        </details>
+
+        <div class="cta-row">
+            <button type="submit" class="button-primary">
+                {% if form.instance.pk %}Save changes{% else %}Save log{% endif %}
+            </button>
+            <a class="button-link" href="{% url 'arbiter:attendance_list' %}">Cancel</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

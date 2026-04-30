@@ -1,0 +1,60 @@
+{# Author: Ian Sun | isun@bu.edu                                              #}
+{# Description: Single-session detail page. Surfaces the full session       #}
+{# metadata in a document-feel header (conference breadcrumb, title, time, #}
+{# topic, speaker) and the full description below as body prose. For users  #}
+{# registered for the session's conference, the header carries a "Log this  #}
+{# session" CTA that deep-links the AttendanceLog form with the session    #}
+{# pre-selected. Users with an existing log instead see "Edit your log".    #}
+
+{% extends 'arbiter/base.html' %}
+
+{% block title %}{{ session.title }} &middot; Arbiter{% endblock %}
+
+{% block content %}
+<section class="conference-page">
+    <header class="page-header">
+        <p class="eyebrow">
+            <a class="breadcrumb"
+               href="{% url 'arbiter:conference_detail' session.conference.pk %}">
+                {{ session.conference.name }}
+            </a>
+        </p>
+        <h1>{{ session.title }}</h1>
+        <p class="lede">
+            {{ session.time_slot|date:"l, F j" }} at {{ session.time_slot|date:"g:i A" }}
+            &middot;
+            <span class="session-pill session-pill-inline">{{ session.topic_area }}</span>
+        </p>
+        {% if session.speaker %}
+            <p class="session-speaker-detail">{{ session.speaker }}</p>
+        {% endif %}
+
+        {% if is_registered %}
+            <div class="cta-row">
+                {% if existing_log %}
+                    <a class="button-primary"
+                       href="{% url 'arbiter:attendance_update' existing_log.pk %}">
+                        Edit your log
+                    </a>
+                    <span class="cta-meta">
+                        Logged {{ existing_log.timestamp|date:"M j" }}.
+                    </span>
+                {% else %}
+                    <a class="button-primary"
+                       href="{% url 'arbiter:attendance_create' %}?session={{ session.pk }}">
+                        Log this session
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </header>
+
+    {% if session.description %}
+        <div class="session-prose">
+            {{ session.description|linebreaks }}
+        </div>
+    {% else %}
+        <p class="lede">No description was provided for this session.</p>
+    {% endif %}
+</section>
+{% endblock %}

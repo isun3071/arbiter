@@ -1,0 +1,205 @@
+{# Author: Ian Sun | isun@bu.edu                                              #}
+{# Description: Synthesis detail page in the document register. Branches    #}
+{# on whether the user has saved an edited_text version: when present,     #}
+{# renders the prose directly with paragraph breaks; when absent, renders  #}
+{# the AI's structured output with priorities, contradictions, talking     #}
+{# points, etc. Citations in the structured view are clickable links back  #}
+{# to the cited AttendanceLog or VendorVisit, resolved from objects the    #}
+{# view attached to enriched_content.                                       #}
+
+{% extends 'arbiter/base.html' %}
+
+{% block title %}{{ synthesis.get_phase_display }} &middot; Arbiter{% endblock %}
+
+{% block content %}
+<article class="synthesis-document">
+    <header class="synthesis-header">
+        <p class="eyebrow">Board recommendation</p>
+        <h1 class="synthesis-title">{{ synthesis.get_phase_display }}</h1>
+        <p class="synthesis-byline">
+            For {{ synthesis.attendee.user.first_name|default:synthesis.attendee.user.username }}
+            &middot; {{ synthesis.attendee.conference.name }}
+            &middot; {{ synthesis.created_at|date:"F j, Y" }}
+            {% if synthesis.edited_text %}
+                &middot; <span class="synthesis-edited">Edited</span>
+            {% endif %}
+        </p>
+
+        <blockquote class="synthesis-board-question">
+            <p class="board-question-label">Your board asked</p>
+            <p class="board-question-text">{{ synthesis.attendee.board_question }}</p>
+        </blockquote>
+    </header>
+
+    {% if synthesis.edited_text %}
+        {# Edited path: render the user's plain-text version. Citation #}
+        {# mentions become text rather than links — once Catherine     #}
+        {# edits, she takes ownership of the prose.                     #}
+        <div class="synthesis-edited-document">
+            {{ synthesis.edited_text|linebreaks }}
+        </div>
+    {% else %}
+        {# Structured path: render the AI's content with clickable      #}
+        {# citations resolved from enriched_content.                    #}
+        {% with content=enriched_content %}
+
+        {% if content.diagnosis %}
+            <section class="synthesis-section synthesis-diagnosis">
+                <p class="synthesis-section-label">What you encountered</p>
+                <p class="synthesis-prose">{{ content.diagnosis }}</p>
+            </section>
+        {% endif %}
+
+        {% if content.contradictions %}
+            <section class="synthesis-section">
+                <h2 class="synthesis-section-title">Tensions worth resolving</h2>
+                {% for c in content.contradictions %}
+                    <article class="synthesis-contradiction">
+                        <p class="contradiction-between">{{ c.between }}</p>
+                        <p class="contradiction-resolution">{{ c.resolution }}</p>
+                        {% if c.supporting_logs or c.supporting_vendors %}
+                            <p class="synthesis-citations">
+                                Drawn from
+                                {% for log in c.supporting_logs %}<a href="{% url 'arbiter:attendance_update' log.pk %}">your &ldquo;{{ log.session.title|truncatechars:48 }}&rdquo; log</a>{% if not forloop.last %}, {% endif %}{% endfor %}{% if c.supporting_logs and c.supporting_vendors %} and {% endif %}{% for v in c.supporting_vendors %}<a href="{% url 'arbiter:vendor_update' v.pk %}">your visit to {{ v.vendor_name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}.
+                            </p>
+                        {% endif %}
+                    </article>
+                {% endfor %}
+            </section>
+        {% endif %}
+
+        {% if content.priorities %}
+            <section class="synthesis-section">
+                <h2 class="synthesis-section-title">Priorities for your board</h2>
+                <ol class="priority-list">
+                    {% for p in content.priorities %}
+                        <li class="priority-item">
+                            <h3 class="priority-title">{{ p.title }}</h3>
+                            <p class="priority-rationale">{{ p.rationale }}</p>
+                            {% if p.supporting_logs or p.supporting_vendors %}
+                                <p class="synthesis-citations">
+                                    Drawn from
+                                    {% for log in p.supporting_logs %}<a href="{% url 'arbiter:attendance_update' log.pk %}">your &ldquo;{{ log.session.title|truncatechars:48 }}&rdquo; log</a>{% if not forloop.last %}, {% endif %}{% endfor %}{% if p.supporting_logs and p.supporting_vendors %} and {% endif %}{% for v in p.supporting_vendors %}<a href="{% url 'arbiter:vendor_update' v.pk %}">your visit to {{ v.vendor_name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}.
+                                </p>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ol>
+            </section>
+        {% endif %}
+
+        {% if content.preliminary_priorities %}
+            <section class="synthesis-section">
+                <h2 class="synthesis-section-title">Preliminary priorities</h2>
+                <p class="synthesis-section-note">
+                    These will sharpen as you log more sessions. Treat them
+                    as draft, not final.
+                </p>
+                <ol class="priority-list">
+                    {% for p in content.preliminary_priorities %}
+                        <li class="priority-item">
+                            <h3 class="priority-title">{{ p.title }}</h3>
+                            <p class="priority-rationale">{{ p.rationale }}</p>
+                            {% if p.supporting_logs or p.supporting_vendors %}
+                                <p class="synthesis-citations">
+                                    Drawn from
+                                    {% for log in p.supporting_logs %}<a href="{% url 'arbiter:attendance_update' log.pk %}">your &ldquo;{{ log.session.title|truncatechars:48 }}&rdquo; log</a>{% if not forloop.last %}, {% endif %}{% endfor %}{% if p.supporting_logs and p.supporting_vendors %} and {% endif %}{% for v in p.supporting_vendors %}<a href="{% url 'arbiter:vendor_update' v.pk %}">your visit to {{ v.vendor_name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}.
+                                </p>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ol>
+            </section>
+        {% endif %}
+
+        {% if content.recommended_sessions %}
+            <section class="synthesis-section">
+                <h2 class="synthesis-section-title">Sessions to prioritize</h2>
+                <ol class="priority-list">
+                    {% for r in content.recommended_sessions %}
+                        <li class="priority-item">
+                            {% if r.session %}
+                                <h3 class="priority-title">
+                                    <a href="{% url 'arbiter:session_detail' r.session.pk %}">{{ r.session.title }}</a>
+                                </h3>
+                            {% endif %}
+                            <p class="priority-rationale">{{ r.rationale }}</p>
+                        </li>
+                    {% endfor %}
+                </ol>
+            </section>
+        {% endif %}
+
+        {% if content.replan_suggestions %}
+            <section class="synthesis-section">
+                <h2 class="synthesis-section-title">Adjustments worth considering</h2>
+                <ul class="replan-list">
+                    {% for s in content.replan_suggestions %}
+                        <li class="replan-item">
+                            <span class="replan-action">{{ s.action|capfirst }}</span>
+                            {% if s.session %}
+                                <a href="{% url 'arbiter:session_detail' s.session.pk %}">{{ s.session.title }}</a>:
+                            {% endif %}
+                            {{ s.rationale }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% endif %}
+
+        {% if content.talking_points %}
+            <section class="synthesis-section">
+                <h2 class="synthesis-section-title">Monday morning talking points</h2>
+                <ul class="talking-points">
+                    {% for t in content.talking_points %}
+                        <li>{{ t }}</li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% endif %}
+
+        {% if content.warnings %}
+            <aside class="synthesis-warning" role="note">
+                <p class="synthesis-warning-text">{{ content.warnings }}</p>
+            </aside>
+        {% endif %}
+
+        {% if content.parse_error %}
+            <section class="synthesis-section synthesis-error">
+                <p>
+                    The AI service returned text that could not be parsed
+                    as structured output. The raw response is shown below
+                    for review.
+                </p>
+                <pre class="synthesis-raw">{{ content.raw }}</pre>
+            </section>
+        {% endif %}
+
+        {% endwith %}
+    {% endif %}
+
+    <footer class="synthesis-footer no-print">
+        <div class="cta-row">
+            <a class="button-link" href="{% url 'arbiter:synthesis_update' synthesis.pk %}">
+                {% if synthesis.edited_text %}Continue editing{% else %}Edit this draft{% endif %}
+            </a>
+            <a class="button-link" href="{% url 'arbiter:synthesis_delete' synthesis.pk %}">
+                Delete
+            </a>
+            <a class="button-link" href="{% url 'arbiter:dashboard' %}">
+                Back to dashboard
+            </a>
+        </div>
+        <p class="synthesis-disclosure">
+            This recommendation is an AI-assisted draft. Verify each
+            claim against your notes before presenting. The AI was
+            instructed to cite its sources but does not always succeed.
+        </p>
+        <p class="synthesis-meta">
+            Generated by {{ synthesis.model_used }}
+            on {{ synthesis.created_at|date:"F j, Y" }}
+            at {{ synthesis.created_at|time:"g:i A" }}.
+        </p>
+    </footer>
+</article>
+{% endblock %}

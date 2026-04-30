@@ -1,0 +1,111 @@
+{# Author: Ian Sun | isun@bu.edu                                              #}
+{# Description: Staff-only form for creating or editing a Session. Most    #}
+{# sessions arrive via the load_secureworld management command; this form #}
+{# is for ad-hoc additions, corrections, or sessions on conferences that  #}
+{# don't have a parser. Gated by StaffRequiredMixin on the view, so a     #}
+{# regular attendee hitting these URLs gets 403, not the form.            #}
+
+{% extends 'arbiter/base.html' %}
+
+{% block title %}
+    {% if form.instance.pk %}Edit session{% else %}Add session{% endif %}
+    &middot; Arbiter
+{% endblock %}
+
+{% block content %}
+<section class="form-page">
+    <p class="eyebrow">Staff &middot; sessions</p>
+    <h1>
+        {% if form.instance.pk %}
+            Edit this session
+        {% else %}
+            Add a session
+        {% endif %}
+    </h1>
+    <p class="lede">
+        Staff-only surface for managing the conference agenda. Most
+        sessions load via the load_secureworld management command; this
+        form is for ad-hoc edits or one-off additions.
+    </p>
+
+    <form method="post" action="" class="form stack" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="form-error" role="alert">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <label class="field">
+            <span class="field-label">Conference</span>
+            {{ form.conference }}
+            {% if form.conference.errors %}
+                <span class="field-error">{{ form.conference.errors|join:" " }}</span>
+            {% endif %}
+        </label>
+
+        <label class="field">
+            <span class="field-label">Title</span>
+            {{ form.title }}
+            {% if form.title.errors %}
+                <span class="field-error">{{ form.title.errors|join:" " }}</span>
+            {% endif %}
+        </label>
+
+        <label class="field">
+            <span class="field-label">Speaker</span>
+            <span class="field-help">
+                Optional. Leave blank for sessions without a single named
+                speaker (panels, keynotes by committee).
+            </span>
+            {{ form.speaker }}
+            {% if form.speaker.errors %}
+                <span class="field-error">{{ form.speaker.errors|join:" " }}</span>
+            {% endif %}
+        </label>
+
+        <label class="field">
+            <span class="field-label">Topic area</span>
+            <span class="field-help">
+                Short label like "AI", "Identity", "Compliance". Drives
+                filtering on the session list and the gap analysis report.
+            </span>
+            {{ form.topic_area }}
+            {% if form.topic_area.errors %}
+                <span class="field-error">{{ form.topic_area.errors|join:" " }}</span>
+            {% endif %}
+        </label>
+
+        <label class="field">
+            <span class="field-label">Start time</span>
+            <span class="field-help">
+                Format: YYYY-MM-DD HH:MM (e.g. "2026-04-08 11:30"). The
+                conference's local time zone is implicit; the parser
+                stores SecureWorld times as America/New_York.
+            </span>
+            {{ form.time_slot }}
+            {% if form.time_slot.errors %}
+                <span class="field-error">{{ form.time_slot.errors|join:" " }}</span>
+            {% endif %}
+        </label>
+
+        <label class="field">
+            <span class="field-label">Description</span>
+            <span class="field-help">Optional. The session abstract.</span>
+            {{ form.description }}
+            {% if form.description.errors %}
+                <span class="field-error">{{ form.description.errors|join:" " }}</span>
+            {% endif %}
+        </label>
+
+        <div class="cta-row">
+            <button type="submit" class="button-primary">
+                {% if form.instance.pk %}Save changes{% else %}Save session{% endif %}
+            </button>
+            <a class="button-link" href="{% url 'arbiter:session_list' %}">Cancel</a>
+            {% if form.instance.pk %}
+                <a class="button-link" href="{% url 'arbiter:session_delete' form.instance.pk %}">Delete</a>
+            {% endif %}
+        </div>
+    </form>
+</section>
+{% endblock %}

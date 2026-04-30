@@ -1,0 +1,105 @@
+{# Author: Ian Sun | isun@bu.edu                                              #}
+{# Description: Cross-conference session browse surface. Renders every       #}
+{# session as an exclusive-open accordion card (same pattern as the         #}
+{# conference detail agenda) with a filter bar at the top for narrowing by  #}
+{# conference or topic_area. Each card shows the conference name as an     #}
+{# eyebrow so users can tell at a glance which event a session belongs to.  #}
+
+{% extends 'arbiter/base.html' %}
+
+{% block title %}Sessions &middot; Arbiter{% endblock %}
+
+{% block content %}
+<section class="conference-page">
+    <header class="page-header">
+        <p class="eyebrow">Catalog</p>
+        <h1>Sessions</h1>
+        <p class="lede">
+            Browse the agenda across every conference. Filter by conference
+            or topic to narrow the view.
+        </p>
+    </header>
+
+    <form method="get" action="" class="filter-bar">
+        <label class="field">
+            <span class="field-label">Conference</span>
+            <select name="conference">
+                <option value="">All conferences</option>
+                {% for conf in conferences %}
+                    <option value="{{ conf.pk }}"
+                            {% if conf.pk|stringformat:"s" == selected_conference %}selected{% endif %}>
+                        {{ conf.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <label class="field">
+            <span class="field-label">Topic</span>
+            <select name="topic">
+                <option value="">All topics</option>
+                {% for topic in topics %}
+                    <option value="{{ topic }}"
+                            {% if topic == selected_topic %}selected{% endif %}>
+                        {{ topic }}
+                    </option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <div class="filter-actions">
+            <button type="submit" class="button-primary">Apply</button>
+            {% if selected_conference or selected_topic %}
+                <a class="button-link" href="{% url 'arbiter:session_list' %}">Reset</a>
+            {% endif %}
+        </div>
+    </form>
+
+    <p class="session-count">
+        {{ sessions|length }} session{{ sessions|length|pluralize }}
+        {% if selected_conference or selected_topic %}match these filters{% else %}in the catalog{% endif %}.
+    </p>
+
+    <div class="session-stack">
+        {% for session in sessions %}
+            <details name="session-list" class="session-card">
+                <summary class="session-summary">
+                    <div class="session-summary-content">
+                        <div class="session-meta-row">
+                            <span class="session-conference">{{ session.conference.name }}</span>
+                            <span class="session-time">
+                                {{ session.time_slot|date:"M j, g:i A" }}
+                            </span>
+                            <span class="session-pill">{{ session.topic_area }}</span>
+                        </div>
+                        <span class="session-title">{{ session.title }}</span>
+                        {% if session.speaker %}
+                            <span class="session-speaker">{{ session.speaker }}</span>
+                        {% endif %}
+                    </div>
+                    <span class="session-chevron" aria-hidden="true"></span>
+                </summary>
+                <div class="session-body">
+                    {% if session.description %}
+                        {{ session.description|linebreaks }}
+                    {% else %}
+                        <p class="field-help">No description provided for this session.</p>
+                    {% endif %}
+                    <div class="session-body-actions">
+                        <a class="button-link" href="{% url 'arbiter:session_detail' session.pk %}">
+                            Open session page
+                        </a>
+                    </div>
+                </div>
+            </details>
+        {% empty %}
+            <div class="empty-state">
+                <p class="lede">No sessions match those filters.</p>
+                {% if selected_conference or selected_topic %}
+                    <a class="button-link" href="{% url 'arbiter:session_list' %}">Clear filters</a>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

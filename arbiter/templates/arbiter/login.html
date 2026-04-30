@@ -1,0 +1,53 @@
+{# Author: Ian Sun | isun@bu.edu                                              #}
+{# Description: Sign-in page. Renders Django's stock AuthenticationForm in    #}
+{# the working register, with a fallback link to the register page for       #}
+{# users who don't yet have an account. Posts back to itself; LoginView      #}
+{# handles authentication and redirects to settings.LOGIN_REDIRECT_URL.       #}
+
+{% extends 'arbiter/base.html' %}
+
+{% block title %}Sign in &middot; Arbiter{% endblock %}
+
+{% block content %}
+<section class="auth-form">
+    <p class="eyebrow">Arbiter</p>
+    <h1>Sign in</h1>
+
+    <p class="lede">
+        Welcome back. Pick up where you left off.
+    </p>
+
+    <form method="post" action="" class="form stack" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="form-error" role="alert">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <label class="field">
+            <span class="field-label">Username</span>
+            {{ form.username }}
+            {% if form.username.errors %}
+                <span class="field-error">{{ form.username.errors|join:" " }}</span>
+            {% endif %}
+        </label>
+
+        <label class="field">
+            <span class="field-label">Password</span>
+            {{ form.password }}
+            {% if form.password.errors %}
+                <span class="field-error">{{ form.password.errors|join:" " }}</span>
+            {% endif %}
+        </label>
+
+        <input type="hidden" name="next" value="{{ next }}">
+
+        <div class="cta-row">
+            <button type="submit" class="button-primary">Sign in</button>
+            <a class="button-link" href="{% url 'arbiter:register' %}">Create an account</a>
+        </div>
+    </form>
+</section>
+{% endblock %}
